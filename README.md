@@ -1,5 +1,5 @@
-CMPUT466Project: 
-Classify Text Blocks in Document
+
+title: Classify Text Blocks in Document
 ===============
 Team members:
 Yuwei Duan - yuwei@ualberta.ca 
@@ -15,6 +15,7 @@ The data is from https://www.kaggle.com/c/sentiment-analysis-on-movie-reviews
 
 ===============
 Theoretical paper links:
+
 Supervised Machine Learning:A Review of Classification Techniques:
 http://www.informatica.si/PDF/31-3/11_Kotsiantis%20-%20Supervised%20Machine%20Learning%20-%20A%20Review%20of...pdf
 					
