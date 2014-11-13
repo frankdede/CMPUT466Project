@@ -17,7 +17,7 @@ class tree_builder:
         pass
 
     def load_data_from_dict(self, data):
-
+        pass
 
 
 def main():
