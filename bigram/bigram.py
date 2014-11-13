@@ -1,11 +1,12 @@
+#!/usr/bin/python
 import nltk
 
 def getOccuranceRateForTuple(tuple,bigramsCollection):
     rate = {}
     for sentiment in bigramsCollection:
-        freqDist = FreqDist(bigramsCollection[bigramsCollection])
-        rate[sentiment] = 
-
+        freqDist = FreqDist(bigramsCollection[sentiment])
+        rate[sentiment] = freqDist.freq(tuple)
+    return rate
 
 def extractBigram(invertedWords):
     bigramsCollection = {}
