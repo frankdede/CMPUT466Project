@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import sys, getopt, exceptions, re
-import nltk
 import json
 
 def createStopWordsList(text):
