@@ -11,7 +11,7 @@ def processStopWords(text):
 def processRawData(text, stopWords = None):
     rawDataList = []
     for line in text:
-        line.split(' ')
+        line.split('\t')
     return rawDataList
 
 def readArgsFromInput(argv):
