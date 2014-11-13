@@ -25,13 +25,17 @@ class tree_builder:
     
     def build_fit_data(self):
         for item in self.attr:
-            
+            index = self.attr[item]['order']
             if self.attr[item]['reverse']:
-                index = self.attr[item]['order']
                 re_index = lambda x: self.attr[item]['re_index'][x]
 
                 for x in xrange(len(self.data)):
                     self.data[x][index] = re_index(self.data[x][index])
+            elif self.attr[item]['type'] == "INT":
+                for x in xrange(len(self.data)):
+                    self.data[x][index] = int(self.data[x][index]) 
+            elif self.attr[item]['type'] == 'DOUBLE':
+                    self.date[x][index] = double(self.date[x][index])
             
 
     def fit(self):
