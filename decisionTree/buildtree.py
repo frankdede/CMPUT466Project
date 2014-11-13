@@ -35,7 +35,7 @@ class tree_builder:
                 for x in xrange(len(self.data)):
                     self.data[x][index] = int(self.data[x][index]) 
             elif self.attr[item]['type'] == 'DOUBLE':
-                    self.date[x][index] = double(self.date[x][index])
+                    self.date[x][index] = float(self.date[x][index])
             
 
     def fit(self):
