@@ -107,8 +107,17 @@ class tree_builder:
         self.attr[attr_set[0]] = attr_dict
         self.attr_order += 1
 
+    def build_attr_index(self):   
+        r = [None] * len(self.attr)
+        for key in self.attr:
+            r[self.attr[key]['order']] = key
+
+        return r
+
     def build_polt(self):
-        tree.export_graphviz(self.tree, self.dot_data)
+        tree.export_graphviz(self.tree, self.dot_data,
+                             self.build_attr_index())
+
     def plot_pdf(self, path):
         self.build_polt()
         graph = pydot.graph_from_dot_data(self.dot_data.getvalue())
