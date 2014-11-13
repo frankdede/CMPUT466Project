@@ -11,7 +11,8 @@ def processStopWords(text):
 def processRawData(text, stopWords = None):
     rawDataList = []
     for line in text:
-        line.split('\t')
+        segments = line.split('\t')
+        rawDataList.append(segments[2])
     return rawDataList
 
 def readArgsFromInput(argv):
@@ -75,6 +76,7 @@ def main(argv):
         
         # parser is in mode 1 then prcoess raw data without stripping the stopwords
         if '-1' in usedOpts:
+            pass
             #processRawData(rawDataFile)
         else:
             stopWordsFile = open(stopWordsName,'r')
