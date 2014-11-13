@@ -32,3 +32,8 @@ http://scikit-learn.org/stable/documentation.html
 ================================
 Licence:
 All text is licensed under the CC-BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/deed.en_US
+
+================================
+REFERENCE:
+Default English stopwords list: 
+http://www.ranks.nl/stopwords
