@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import sys, getopt, exceptions, re
 import nltk
+import json
 
 def createStopWordsList(text):
     stopWordsList = []
@@ -41,7 +42,7 @@ def createInvertedRawData(text, stopWords = None):
         if sentiment in invertedRawData:
             # append the sentence to its corresponding sentiment list
             invertedRawData[sentiment].append(entry)
-        else
+        else:
             invertedRawData[sentiment] = []
             invertedRawData[sentiment].append(entry)
 
@@ -115,12 +116,13 @@ def main(argv):
         
         # parser is in mode 1 then prcoess raw data without stripping the stopwords
         if '-1' in usedOpts:
-            pass
-            #createInvertedRawData(rawDataFile)
+            createInvertedRawData(rawDataFile)
         else:
             stopWordsFile = open(stopWordsName,'r')
             stopWordsList = createStopWordsList(stopWordsFile)
-            createInvertedRawData(rawDataFile,stopWordsList)
+            invertedRawData = createInvertedRawData(rawDataFile,stopWordsList)
+            jsonRawData = json.dumps(invertedRawData)
+            print jsonRawData
             
     except IOError as e:
         print "Cannot read:",fileName
