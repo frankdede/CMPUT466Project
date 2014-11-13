@@ -5,6 +5,7 @@ import json
 
 def createStopWordsList(text):
     stopWordsList = []
+#return map(lambda x:line.strip('\n').split(),text)
     for line in text:
         stopWordsList.extend(line.strip('\n').split(' '))
     return stopWordsList
@@ -49,7 +50,7 @@ def createInvertedRawData(text, stopWords = None):
     return invertedRawData
 
 def stripWords(sentenceTokens,wordsList):
-
+# suggestion: return filter(lambda x:x not in wordsList)
     for word in wordsList:
         if word in sentenceTokens:
             sentenceTokens.remove(word)
