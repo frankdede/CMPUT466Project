@@ -1,4 +1,3 @@
-
 title: Classify Text Blocks in Document
 ===============
 Team members:
