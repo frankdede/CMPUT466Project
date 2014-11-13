@@ -1,5 +1,5 @@
 numpy
 scipy
 matplotlib
-scikit
 pydot
+scikit-learn

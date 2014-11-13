@@ -130,7 +130,6 @@ class tree_builder:
     def plot_png(self, path):
         self.build_polt()
 
-
         from urllib import urlencode, quote
         import os
         post = "chl=%s&cht=gv" % quote(self.dot_data.getvalue())
