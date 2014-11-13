@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import sys, getopt, exceptions
+import sys, getopt, exceptions, re
 import nltk
 
 def processStopWords(text):
@@ -9,11 +9,37 @@ def processStopWords(text):
     return stopWordsList
 
 def processRawData(text, stopWords = None):
-    rawDataList = []
+    invertedRawData = {}
+    
     for line in text:
-        segments = line.split('\t')
-        rawDataList.append(segments[2])
-    return rawDataList
+        # get sentence
+        sentenceStr = line.split('\t')[2]
+        # get sentiment
+        sentiment = int(line.strip('\n').split('\t')[3])
+        # replace one or more spaces by single space
+        # then split
+        sentenceTokens = re.sub("\s+"," ",entenceStr).split(' ')
+
+        # if stopwords are required, do the following
+        if stopwords:
+            sentenceTokens = stripWords(sentenceTokens,stopwords)
+        
+        # create a sentiment key if doesn't exist
+        if sentiment in invertedRawData:
+            # append the sentence to its corresponding sentiment list
+            invertedRawData[sentiment].append(sentenceTokens)
+        else
+            invertedRawData[sentiment] = []
+            invertedRawData[sentiment].append(sentenceTokens)
+
+    return invertedRawData
+
+def stripWords(sentenceTokens,wordsList):
+
+    for word in wordsList:
+        if word in sentenceTokens:
+            sentenceTokens.remove(word)
+    return sentenceTokens
 
 def readArgsFromInput(argv):
     rawDataName = stopWordsName = outputName = directory = None 
@@ -81,7 +107,7 @@ def main(argv):
         else:
             stopWordsFile = open(stopWordsName,'r')
             stopWordsList = processStopWords(stopWordsFile)
-            #processRawData(rawDataFile,stopWordsList)
+            processRawData(rawDataFile,stopWordsList)
             
     except IOError as e:
         print "Cannot read:",fileName
