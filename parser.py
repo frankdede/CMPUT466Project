@@ -99,7 +99,7 @@ def readArgsFromInput(argv):
 
     # pareser wihout flag -o, then the output will be named as this by default
     if '-o' not in usedOpts:
-        outputName = 'no_stopwords.txt'
+        outputName = 'default_invertedRawdata.json'
 
     # cannot proceed without filename of raw data
     if rawDataName == None:
@@ -116,14 +116,20 @@ def main(argv):
         
         # parser is in mode 1 then prcoess raw data without stripping the stopwords
         if '-1' in usedOpts:
-            createInvertedRawData(rawDataFile)
+            invertedRawData = createInvertedRawData(rawDataFile)
         else:
             stopWordsFile = open(stopWordsName,'r')
             stopWordsList = createStopWordsList(stopWordsFile)
             invertedRawData = createInvertedRawData(rawDataFile,stopWordsList)
-            jsonRawData = json.dumps(invertedRawData)
-            print jsonRawData
-            
+            stopWordsFile.close()
+        
+        jsonRawData = json.dumps(invertedRawData)
+        
+        rawDataFile.close()
+        output = open(outputName, 'w')
+        output.write(jsonRawData)
+        output.close()
+        
     except IOError as e:
         print "Cannot read raw data file or stop-word file" 
 
