@@ -1,6 +1,15 @@
 #!/usr/bin/python
+
 import sys, getopt, exceptions, re
 import json
+from bigram import bigram
+
+def writeFile(name,content):
+    print("====== Writing '"+ name +"' to the disk ======")
+    output = open(name, 'w')
+    output.write(content)
+    output.close()    
+    print("Done")
 
 def createStopWordsList(text):
     stopWordsList = []
@@ -11,7 +20,17 @@ def createStopWordsList(text):
 
 def createInvertedRawData(text, stopWords = None):
     invertedRawData = {}
+    print("********** Skipped the first line of the file **********")
     text.readline()
+    print("********** Creating Inverted Raw Data **********")
+    
+    if stopWords:
+        signal = 'ON'
+    else:
+        signal = 'OFF'
+
+    print("Strip Stop-words:" + signal)
+
     for line in text:
         # Split line
         lineTokens = line.strip('\n').split('\t')
@@ -45,7 +64,7 @@ def createInvertedRawData(text, stopWords = None):
         else:
             invertedRawData[sentiment] = []
             invertedRawData[sentiment].append(entry)
-
+    print("Done")
     return invertedRawData
 
 def stripWords(sentenceTokens,wordsList):
@@ -121,17 +140,21 @@ def main(argv):
             stopWordsFile = open(stopWordsName,'r')
             stopWordsList = createStopWordsList(stopWordsFile)
             invertedRawData = createInvertedRawData(rawDataFile,stopWordsList)
-            stopWordsFile.close()
-        
+
+        # extract the bigrams
+        bigramsCollection = bigram.extractBigrams(invertedRawData)
+        freqDist = bigram.getFrequencyDist(bigramsCollection)
+
         jsonRawData = json.dumps(invertedRawData)
-        
+        jsonBigrams = json.dumps(bigramsCollection)
+
         rawDataFile.close()
-        output = open(outputName, 'w')
-        output.write(jsonRawData)
-        output.close()
+        stopWordsFile.close()
+
+        writeFile(outputName,jsonRawData)
+        writeFile('bigramsCollection.json',jsonBigrams)
         
     except IOError as e:
         print "Cannot read raw data file or stop-word file" 
-
 if __name__ == "__main__":
     main(sys.argv[1:])
