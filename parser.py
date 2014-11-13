@@ -11,7 +11,7 @@ def createStopWordsList(text):
 
 def createInvertedRawData(text, stopWords = None):
     invertedRawData = {}
-    
+    text.readline()
     for line in text:
         # Split line
         lineTokens = line.strip('\n').split('\t')
@@ -30,11 +30,11 @@ def createInvertedRawData(text, stopWords = None):
 
         # replace one or more spaces by single space
         # then split
-        sentenceTokens = re.sub("\s+"," ",entenceStr).split(' ')
+        sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
 
         # if stopwords are required, do the following
-        if stopwords:
-            sentenceTokens = stripWords(sentenceTokens,stopwords)
+        if stopWords:
+            sentenceTokens = stripWords(sentenceTokens,stopWords)
         
         # create a sentiment key if doesn't exist
         entry = {"pharseId":pharseId,"sentenceId":sentenceId,"sentence":sentenceTokens}
@@ -125,7 +125,7 @@ def main(argv):
             print jsonRawData
             
     except IOError as e:
-        print "Cannot read:",fileName
+        print "Cannot read raw data file or stop-word file" 
 
 if __name__ == "__main__":
     main(sys.argv[1:])
