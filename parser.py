@@ -2,20 +2,31 @@
 import sys, getopt, exceptions, re
 import nltk
 
-def processStopWords(text):
+def createStopWordsList(text):
     stopWordsList = []
     for line in text:
         stopWordsList.extend(line.strip('\n').split(' '))
     return stopWordsList
 
-def processRawData(text, stopWords = None):
+def createInvertedRawData(text, stopWords = None):
     invertedRawData = {}
     
     for line in text:
+        # Split line
+        lineTokens = line.strip('\n').split('\t')
+
+        # get PharseId
+        pharseId = int(lineTokens[0])
+
+        # get SentenceId
+        sentenceId = int(lineTokens[1])
+
         # get sentence
-        sentenceStr = line.split('\t')[2]
+        sentenceStr = lineTokens[2]
+
         # get sentiment
-        sentiment = int(line.strip('\n').split('\t')[3])
+        sentiment = int(lineTokens[3])
+
         # replace one or more spaces by single space
         # then split
         sentenceTokens = re.sub("\s+"," ",entenceStr).split(' ')
@@ -25,12 +36,14 @@ def processRawData(text, stopWords = None):
             sentenceTokens = stripWords(sentenceTokens,stopwords)
         
         # create a sentiment key if doesn't exist
+        entry = {"pharseId":pharseId,"sentenceId":sentenceId,"sentence":sentenceTokens}
+
         if sentiment in invertedRawData:
             # append the sentence to its corresponding sentiment list
-            invertedRawData[sentiment].append(sentenceTokens)
+            invertedRawData[sentiment].append(entry)
         else
             invertedRawData[sentiment] = []
-            invertedRawData[sentiment].append(sentenceTokens)
+            invertedRawData[sentiment].append(entry)
 
     return invertedRawData
 
@@ -103,11 +116,11 @@ def main(argv):
         # parser is in mode 1 then prcoess raw data without stripping the stopwords
         if '-1' in usedOpts:
             pass
-            #processRawData(rawDataFile)
+            #createInvertedRawData(rawDataFile)
         else:
             stopWordsFile = open(stopWordsName,'r')
-            stopWordsList = processStopWords(stopWordsFile)
-            processRawData(rawDataFile,stopWordsList)
+            stopWordsList = createStopWordsList(stopWordsFile)
+            createInvertedRawData(rawDataFile,stopWordsList)
             
     except IOError as e:
         print "Cannot read:",fileName
