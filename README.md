@@ -1,4 +1,4 @@
-title: Classify Text Blocks in Document
+T12 - Sentiment Analysis on Movie Reviews
 ===============
 Team members:
 Yuwei Duan - yuwei@ualberta.ca 
