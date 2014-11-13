@@ -7,10 +7,14 @@ Chongyang Ye - cye2@ualberta.ca
 Tianyi Wu - twu5@ualberta.ca
 
 ===============
-Data Structure:
-The size of training set is approximately 2.1MB, each data point (sample) has 145 features.The responses have 33 labels. 
-The data is from https://www.kaggle.com/c/sentiment-analysis-on-movie-reviews
+Abstract:
+Our task is to label phrases from the Rotten Tomatoes movie review dataset on a scale of five values: 0 ­ negative, 1 ­ somewhat negative, 2 ­ neutral, 3 ­ somewhat positive, 4 ­ positive. The challenges that we may encounter are the variation in human language expression such as sarcasm, terseness etc.
+We found our topic from Kaggle.com. Kaggle.com provides both the testing data and the training data.
+https://www.kaggle.com/c/sentiment-analysis-on-movie-reviews
 
+===============
+Data Structure:
+The training dataset contains four features: PharseId,SentenceId,Phrase and Sentiment. There are 8544 sentences (meaningful and human readable english sentences) in total, some of the sentences are splitted into short phrases. Therefore, those short phrases are the subset of the same sentence. Each phrase is associated with a sentiment label, those labels are represented by integers ranging from 0 to 4.
 
 ===============
 Theoretical paper links:
