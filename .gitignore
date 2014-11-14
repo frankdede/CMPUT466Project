@@ -1,6 +1,11 @@
 # mac's s**t
 .DS_store
 
+
+# json
+.json
+.txt
+
 # vim
 *.swp
 *.swo
