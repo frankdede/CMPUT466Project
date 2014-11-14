@@ -4,11 +4,10 @@ import numpy
 
 def createFreqMatrix(n,splitedRawData,freqLookupData):
 
-    #size = (len(splitedRawData),n+1)
-    size = (500,n+1)
+    size = (len(splitedRawData),n)
     freqMatrix = numpy.zeros(size)
 
-    for entry in range(500):
+    for entry in range(len(splitedRawData)):
         size = (1,len(splitedRawData[entry]['sentence']))
         for part in range(len(splitedRawData[entry]['sentence'])):
             total = 0;
@@ -30,7 +29,6 @@ def createFreqMatrix(n,splitedRawData,freqLookupData):
         
         freqMatrix[entry][n] = splitedRawData[entry]['sentiment']
         print(entry,partAverage,splitedRawData[entry]['sentiment'])
-    
     saveMatrix(freqMatrix)
 
 
