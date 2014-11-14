@@ -35,7 +35,8 @@ class tree_builder:
                 for x in xrange(len(self.data)):
                     self.data[x][index] = int(self.data[x][index]) 
             elif self.attr[item]['type'] == 'DOUBLE':
-                    self.date[x][index] = float(self.date[x][index])
+                for x in xrange(len(self.data)):
+                    self.data[x][index] = float(self.data[x][index])
             
 
     def fit(self):
@@ -130,6 +131,8 @@ class tree_builder:
     def plot_png(self, path):
         self.build_polt()
 
+        c = open(".tmp.dot",'w')
+        c.write(self.dot_data.getvalue())
         from urllib import urlencode, quote
         import os
         post = "chl=%s&cht=gv" % quote(self.dot_data.getvalue())

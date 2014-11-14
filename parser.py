@@ -5,7 +5,7 @@ import json
 from bigram import bigram
 from unigram import unigram
 from stats import stats
-from tools import splitter
+from tools import splitter,generator
 
 def writeFile(name,content):
     print("====== Writing '"+ name +"' to the disk ======")
@@ -208,12 +208,14 @@ def main(argv):
         # bigram sentences by n 
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
 
+        matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
+
         # dump all the data
-        jsonInvertedRawData = json.dumps(invertedRawData)
-        jsonBigrams = json.dumps(bigramsInvertedCollection)
-        jsonUnigrams = json.dumps(unigramsInvertedCollection)
-        jsonRawData = json.dumps(rawData)
-        jsonSplitedBigramRawData = json.dumps(splitedBigramRawData)
+        #jsonInvertedRawData = json.dumps(invertedRawData)
+        #jsonBigrams = json.dumps(bigramsInvertedCollection)
+        #jsonUnigrams = json.dumps(unigramsInvertedCollection)
+        #jsonRawData = json.dumps(rawData)
+        #jsonSplitedBigramRawData = json.dumps(splitedBigramRawData)
 
         rawDataFile.close()
         stopWordsFile.close()
@@ -221,7 +223,7 @@ def main(argv):
         # save files
         #writeFile(outputName,jsonInvertedRawData)
         #writeFile('rawdata.json',jsonRawData)
-        writeFile('SplitedBigramRawData.json',jsonSplitedBigramRawData)
+        #writeFile('SplitedBigramRawData.json',jsonSplitedBigramRawData)
         #writeFile('bigramsCollection.json',jsonBigrams)
         #writeFile('unigramsCollection.json',jsonUnigrams)
     except IOError as e:
