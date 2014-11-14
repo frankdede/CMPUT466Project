@@ -40,8 +40,8 @@ def extractRawData(text,stopWords = None):
         if stopWords:
             sentenceTokens = stripWords(sentenceTokens,stopWords)
 
-        entry = {"sentence":sentenceTokens,"sentiment",sentiment}
-
+        entry = {"sentence":sentenceTokens,"sentiment":sentiment}
+        
 
 
 
