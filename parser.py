@@ -25,25 +25,34 @@ def extractRawData(text,stopWords = None):
     rawData = []
     print("********** Skipped the first line of the file **********")
     text.readline()
-    print("********** Creating Inverted Raw Data **********")
+    print("********** Creating Raw Data **********")
+
+    if stopWords:
+        signal = 'ON'
+    else:
+        signal = 'OFF'
+        
+    prevId = 0
 
     for line in text:
+
         lineTokens = line.strip('\n').split('\t')
+        sentenceId = int(lineTokens[1])
 
-        sentenceStr = lineTokens[2]
+        if sentenceId > prevId:
+            prevId = sentenceId
+            sentenceStr = lineTokens[2]
+            sentiment = int(lineTokens[3])
+            sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
+            # if stopwords are required, do the following
+            if stopWords:
+                sentenceTokens = stripWords(sentenceTokens,stopWords)
+            entry = {"sentenceId":sentenceId,"sentence":sentenceTokens,"sentiment":sentiment}
+            rawData.append(entry)
 
-        sentiment = int(lineTokens[3])
-
-        sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
-
-        # if stopwords are required, do the following
-        if stopWords:
-            sentenceTokens = stripWords(sentenceTokens,stopWords)
-
-        entry = {"sentence":sentenceTokens,"sentiment":sentiment}
+    print("Done")
+    return rawData
         
-
-
 
 def createInvertedRawData(text, stopWords = None):
     invertedRawData = {}
@@ -163,10 +172,22 @@ def main(argv):
         # parser is in mode 1 then prcoess raw data without stripping the stopwords
         if '-1' in usedOpts:
             invertedRawData = createInvertedRawData(rawDataFile)
+            rawDataFile.close()
+
+            rawDataFile = open(rawDataName,'r')
+            rawData = extractRawData(rawDataFile)
+            rawDataFile.close()
+
         else:
             stopWordsFile = open(stopWordsName,'r')
             stopWordsList = createStopWordsList(stopWordsFile)
+
             invertedRawData = createInvertedRawData(rawDataFile,stopWordsList)
+            rawDataFile.close()
+
+            rawDataFile = open(rawDataName,'r')
+            rawData = extractRawData(rawDataFile,stopWordsList)
+            rawDataFile.close()
 
         stats.report(invertedRawData)
         # extract the bigrams
@@ -176,14 +197,16 @@ def main(argv):
         unigramsCollection = unigram.extractUnigrams(invertedRawData)
         unifreqDist = bigram.getFrequencyDist(unigramsCollection)
         
-        jsonRawData = json.dumps(invertedRawData)
+        jsonInvertedRawData = json.dumps(invertedRawData)
         jsonBigrams = json.dumps(bigramsCollection)
         jsonUnigrams = json.dumps(unigramsCollection)
+        jsonRawData = json.dumps(rawData)
 
         rawDataFile.close()
         stopWordsFile.close()
 
-        writeFile(outputName,jsonRawData)
+        writeFile(outputName,jsonInvertedRawData)
+        writeFile('rawdata.json',jsonRawData)
         writeFile('bigramsCollection.json',jsonBigrams)
         writeFile('unigramsCollection.json',jsonUnigrams)
     except IOError as e:
