@@ -202,9 +202,10 @@ def main(argv):
         
         # extract the bigrams from raw data
         bigramsRawData = bigram.extractBigramsFromRawData(rawData)
-        print(bigramsRawData)
-        #print(len(bigramsRawData))
+        # print(bigramsRawData)
+        # print(len(bigramsRawData))
 
+        # bigram sentences by n 
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
 
         # dump all the data
@@ -212,6 +213,7 @@ def main(argv):
         jsonBigrams = json.dumps(bigramsInvertedCollection)
         jsonUnigrams = json.dumps(unigramsInvertedCollection)
         jsonRawData = json.dumps(rawData)
+        jsonSplitedBigramRawData = json.dumps(splitedBigramRawData)
 
         rawDataFile.close()
         stopWordsFile.close()
@@ -219,6 +221,7 @@ def main(argv):
         # save files
         #writeFile(outputName,jsonInvertedRawData)
         #writeFile('rawdata.json',jsonRawData)
+        writeFile('SplitedBigramRawData.json',jsonSplitedBigramRawData)
         #writeFile('bigramsCollection.json',jsonBigrams)
         #writeFile('unigramsCollection.json',jsonUnigrams)
     except IOError as e:
