@@ -3,6 +3,7 @@
 import sys, getopt, exceptions, re
 import json
 from bigram import bigram
+from stats import stats
 
 def writeFile(name,content):
     print("====== Writing '"+ name +"' to the disk ======")
@@ -13,10 +14,35 @@ def writeFile(name,content):
 
 def createStopWordsList(text):
     stopWordsList = []
-#return map(lambda x:line.strip('\n').split(),text)
+    #return map(lambda x:line.strip('\n').split(),text)
     for line in text:
         stopWordsList.extend(line.strip('\n').split(' '))
     return stopWordsList
+
+
+def extractRawData(text,stopWords = None):
+    rawData = []
+    print("********** Skipped the first line of the file **********")
+    text.readline()
+    print("********** Creating Inverted Raw Data **********")
+
+    for line in text:
+        lineTokens = line.strip('\n').split('\t')
+
+        sentenceStr = lineTokens[2]
+
+        sentiment = int(lineTokens[3])
+
+        sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
+
+        # if stopwords are required, do the following
+        if stopWords:
+            sentenceTokens = stripWords(sentenceTokens,stopWords)
+
+        entry = {"sentence":sentenceTokens,"sentiment",sentiment}
+
+
+
 
 def createInvertedRawData(text, stopWords = None):
     invertedRawData = {}
@@ -141,6 +167,7 @@ def main(argv):
             stopWordsList = createStopWordsList(stopWordsFile)
             invertedRawData = createInvertedRawData(rawDataFile,stopWordsList)
 
+        stats.report(invertedRawData)
         # extract the bigrams
         bigramsCollection = bigram.extractBigrams(invertedRawData)
         freqDist = bigram.getFrequencyDist(bigramsCollection)
