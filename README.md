@@ -43,3 +43,6 @@ All text is licensed under the CC-BY-SA 4.0 http://creativecommons.org/licenses/
 REFERENCE:
 Default English stopwords list: 
 http://www.ranks.nl/stopwords
+
+Punctuation List:
+http://www.gracetierney.com/punctuation.htm
