@@ -9,15 +9,15 @@ def splitSentence(n,rawData):
             for i in range(n):
                 partsList[i] = entry['sentence'][i*partLen:(i+1)*partLen]
 
-            if (length / n) > 0:
-                partsList[n] = entry['sentence'][n*partLen:]    
+            if (length % n) > 0:
+                partsList[n-1].extend(entry['sentence'][n*partLen:])    
         else:
             for i in range(length):
                 partsList[i] = entry['sentence'][i]
         entry['sentence'] = partsList
     return rawData
 
-# rawData = [{'sentenceId':1,'sentence':["a","b","c","d","e"]}]
-# print(len(rawData[0]['sentence']))
+# Here are some tesing code
+# rawData = [{'sentenceId':1,'sentence':["My","name","is","frank","huang",".","lalal","dads","dsddsa"]}]
+# rawData.append({'sentenceId':2,'sentence':["I","like","this","food"]})
 # print(splitSentence(3,rawData))
-

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import nltk
-def extractUnigrams(invertedRawData):
+def extractUnigramsFromInvertedRawData(invertedRawData):
     print("********** Extracting Unigram from Raw Data **********")
     unigramCollection = {}
     #print(invertedRawData[0])

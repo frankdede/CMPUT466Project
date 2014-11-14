@@ -3,7 +3,7 @@ import nltk
 
 # use of frequency distribution : freqTable[0].freq(('abc','def'))
 def getFrequencyDist(bigramsCollection):
-    print("********** creating frequency distribution **********")
+    print("********** Creating Frequency Distribution **********")
     freqDist = {}
     for sentiment in bigramsCollection:
         print("Processing sentiment " + str(sentiment) )
@@ -12,9 +12,9 @@ def getFrequencyDist(bigramsCollection):
     print("Done")
     return freqDist
 
-def extractBigrams(invertedRawData):
+def extractBigramsFromInvertedRawData(invertedRawData):
     bigramsCollection = {}
-    print("********** Extracting Bigrams from Raw Data **********")
+    print("********** Converting Sentence to Bigrams for Inverted Raw Data **********")
     for sentiment in invertedRawData:
         print("Processing sentiment " + str(sentiment) )
         if sentiment not in bigramsCollection:
@@ -27,3 +27,10 @@ def extractBigrams(invertedRawData):
             bigramsCollection[sentiment].extend(bigramsTupleList)
     print("Done")
     return bigramsCollection
+
+def extractBigramsFromRawData(rawData):
+
+    for entry in rawData:
+        bigramsTupleList= list(nltk.bigrams(entry['sentence']))
+        entry['sentence'] = bigramsTupleList
+    return rawData

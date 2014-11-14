@@ -5,6 +5,7 @@ import json
 from bigram import bigram
 from unigram import unigram
 from stats import stats
+from tools import splitter
 
 def writeFile(name,content):
     print("====== Writing '"+ name +"' to the disk ======")
@@ -31,7 +32,7 @@ def extractRawData(text,stopWords = None):
         signal = 'ON'
     else:
         signal = 'OFF'
-        
+
     prevId = 0
 
     for line in text:
@@ -185,30 +186,41 @@ def main(argv):
             invertedRawData = createInvertedRawData(rawDataFile,stopWordsList)
             rawDataFile.close()
 
+            # 
             rawDataFile = open(rawDataName,'r')
             rawData = extractRawData(rawDataFile,stopWordsList)
             rawDataFile.close()
 
         stats.report(invertedRawData)
-        # extract the bigrams
-        bigramsCollection = bigram.extractBigrams(invertedRawData)
-        freqDist = bigram.getFrequencyDist(bigramsCollection)
-        # extract the unigrams
-        unigramsCollection = unigram.extractUnigrams(invertedRawData)
-        unifreqDist = bigram.getFrequencyDist(unigramsCollection)
+        # extract the bigrams from inverted raw data
+        bigramsInvertedCollection = bigram.extractBigramsFromInvertedRawData(invertedRawData)
+        freqDist = bigram.getFrequencyDist(bigramsInvertedCollection)
+
+        # extract the unigrams from inverted raw data
+        unigramsInvertedCollection = unigram.extractUnigramsFromInvertedRawData(invertedRawData)
+        unifreqDist = bigram.getFrequencyDist(unigramsInvertedCollection)
         
+        # extract the bigrams from raw data
+        bigramsRawData = bigram.extractBigramsFromRawData(rawData)
+        print(bigramsRawData)
+        #print(len(bigramsRawData))
+
+        splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
+
+        # dump all the data
         jsonInvertedRawData = json.dumps(invertedRawData)
-        jsonBigrams = json.dumps(bigramsCollection)
-        jsonUnigrams = json.dumps(unigramsCollection)
+        jsonBigrams = json.dumps(bigramsInvertedCollection)
+        jsonUnigrams = json.dumps(unigramsInvertedCollection)
         jsonRawData = json.dumps(rawData)
 
         rawDataFile.close()
         stopWordsFile.close()
 
-        writeFile(outputName,jsonInvertedRawData)
-        writeFile('rawdata.json',jsonRawData)
-        writeFile('bigramsCollection.json',jsonBigrams)
-        writeFile('unigramsCollection.json',jsonUnigrams)
+        # save files
+        #writeFile(outputName,jsonInvertedRawData)
+        #writeFile('rawdata.json',jsonRawData)
+        #writeFile('bigramsCollection.json',jsonBigrams)
+        #writeFile('unigramsCollection.json',jsonUnigrams)
     except IOError as e:
         print "Cannot read raw data file or stop-word file" 
 if __name__ == "__main__":
