@@ -25,6 +25,5 @@ def extractBigrams(invertedRawData):
             # will look like this [('a', 'b'), ('b', 'c'), ('c', 'd')]
             bigramsTupleList= list(nltk.bigrams(entry['sentence']))
             bigramsCollection[sentiment].extend(bigramsTupleList)
-    print(len(bigramsCollection))
     print("Done")
     return bigramsCollection
