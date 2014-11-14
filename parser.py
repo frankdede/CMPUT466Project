@@ -3,6 +3,7 @@
 import sys, getopt, exceptions, re
 import json
 from bigram import bigram
+from unigram import unigram
 from stats import stats
 
 def writeFile(name,content):
@@ -171,16 +172,20 @@ def main(argv):
         # extract the bigrams
         bigramsCollection = bigram.extractBigrams(invertedRawData)
         freqDist = bigram.getFrequencyDist(bigramsCollection)
-
+        # extract the unigrams
+        unigramsCollection = unigram.extractUnigrams(invertedRawData)
+        unifreqDist = bigram.getFrequencyDist(unigramsCollection)
+        
         jsonRawData = json.dumps(invertedRawData)
         jsonBigrams = json.dumps(bigramsCollection)
+        jsonUnigrams = json.dumps(unigramsCollection)
 
         rawDataFile.close()
         stopWordsFile.close()
 
         writeFile(outputName,jsonRawData)
         writeFile('bigramsCollection.json',jsonBigrams)
-        
+        writeFile('unigramsCollection.json',jsonUnigrams)
     except IOError as e:
         print "Cannot read raw data file or stop-word file" 
 if __name__ == "__main__":
