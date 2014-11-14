@@ -4,16 +4,16 @@ def splitSentence(n,rawData):
     for entry in rawData:
         length = len(entry['sentence'])
         partLen = length/n
-        partsList = {}
+        partsList = []
         if length > n:
             for i in range(n):
-                partsList[i] = entry['sentence'][i*partLen:(i+1)*partLen]
+                partsList.append(entry['sentence'][i*partLen:(i+1)*partLen])
 
             if (length % n) > 0:
                 partsList[n-1].extend(entry['sentence'][n*partLen:])    
         else:
             for i in range(length):
-                partsList[i] = entry['sentence'][i]
+                partsList.append(entry['sentence'][i])
         entry['sentence'] = partsList
     return rawData
 
