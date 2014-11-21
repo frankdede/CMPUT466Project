@@ -1,6 +1,8 @@
 # mac's s**t
 .DS_store
 
+#tmp
+.*.tmp
 
 # json
 .json

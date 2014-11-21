@@ -8,7 +8,7 @@ import argparse
 from sklearn import tree
 from sklearn.externals.six import StringIO
 #from scipy.io.arff import loadarff
-#import pydot
+import pydot
 import sys
 
 import scipy as sp
@@ -151,7 +151,8 @@ def main():
     t = tree_builder()
     t.load_data_from_file(args.INPUT[0])
     t.fit()
-    t.plot_png(args.OUTPUT[0])
+    t.plot_pdf(args.OUTPUT[0])
+    #t.plot_png(args.OUTPUT[0])
         
 def test():
     t = tree_builder()
