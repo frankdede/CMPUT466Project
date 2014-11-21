@@ -27,7 +27,6 @@ def getAvgSentenceLengthOfRawData(invertedRawData):
 
     return totalLen/count
 
-
 def report(invertedRawData):
 
     longestLength = lenLongestSentence(invertedRawData)
@@ -39,3 +38,7 @@ def report(invertedRawData):
         print("Sentiment:" + str(sentiment) + " has "+ str(count[sentiment]) +" lines of sentence")
     print("Average Sentiment Length:" + str(average)) 
     print("========================================")
+
+
+def getWordAverageScore(rawData):
+    pass
