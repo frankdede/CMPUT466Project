@@ -24,8 +24,8 @@ def createStopWordsList(text):
 
 def extractRawData(text,stopWords = None):
     rawData = []
-    print("********** Skipped the first line of the file **********")
     text.readline()
+    print("********** Skipped the first line **********")
     print("********** Creating Raw Data **********")
 
     if stopWords:
@@ -57,8 +57,8 @@ def extractRawData(text,stopWords = None):
 
 def createInvertedRawData(text, stopWords = None):
     invertedRawData = {}
-    print("********** Skipped the first line of the file **********")
     text.readline()
+    print("********** Skipped the first line **********")
     print("********** Creating Inverted Raw Data **********")
     
     if stopWords:
@@ -103,6 +103,18 @@ def createInvertedRawData(text, stopWords = None):
             invertedRawData[sentiment].append(entry)
     print("Done")
     return invertedRawData
+
+
+def getBagOfWords(rawData):
+    bag = []
+    for entry in rawData:
+        for word in entry['sentence']:
+            #print entry['sentence']
+            bag.append(word)
+
+    print bag
+    return bag
+
 
 def stripWords(sentenceTokens,wordsList):
 # suggestion: return filter(lambda x:x not in wordsList)
@@ -181,15 +193,22 @@ def main(argv):
 
         else:
             stopWordsFile = open(stopWordsName,'r')
+
+            # create stopwords list
             stopWordsList = createStopWordsList(stopWordsFile)
 
+            # create invertedRawData
             invertedRawData = createInvertedRawData(rawDataFile,stopWordsList)
             rawDataFile.close()
 
-            # 
             rawDataFile = open(rawDataName,'r')
+
+            # extract rawData from rawDataFile
             rawData = extractRawData(rawDataFile,stopWordsList)
             rawDataFile.close()
+
+            # Now bag of words is ready for feature construction
+            bagOfWords = getBagOfWords(rawData)
 
         stats.report(invertedRawData)
         # extract the bigrams from inverted raw data
@@ -206,10 +225,14 @@ def main(argv):
         # print(len(bigramsRawData))
 
         # bigram sentences by n 
+
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
         print(type(splitedBigramRawData))
         print(type(freqDist))
         matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
+        #splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
+
+        #matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
 
         # dump all the data
         #jsonInvertedRawData = json.dumps(invertedRawData)
