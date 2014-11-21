@@ -31,7 +31,16 @@ def createFreqMatrix(n,splitedRawData,freqLookupData):
         freqMatrix[entry][n] = str(splitedRawData[entry]['sentiment'])
         print(entry,freqMatrix[entry][n])
     saveMatrix(freqMatrix)
-
-
+#
+def createFeatureBagMatrix(splitedRawData,removeSet):
+    totalLabelSet = set()
+    for sentence in splitedRawData:
+        totalLabelSet = totalLabelSet.union(set(sentence['sentence']))
+    print(totalLabelSet)
 def saveMatrix(matrix):
     numpy.savetxt("matrix.txt", matrix, delimiter=",",fmt="%s")
+
+if __name__ == '__main__':
+    rawData = [{'sentenceId':1,'sentence':["My","name","is","frank","huang",".","lalal","dads","dsddsa"]}]
+    rawData.append({'sentenceId':2,'sentence':["I","like","this","food"]})
+    createFeatureBagMatrix(rawData,{})

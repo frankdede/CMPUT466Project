@@ -207,7 +207,8 @@ def main(argv):
 
         # bigram sentences by n 
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
-
+        print(type(splitedBigramRawData))
+        print(type(freqDist))
         matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
 
         # dump all the data
