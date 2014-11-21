@@ -41,4 +41,23 @@ def report(invertedRawData):
 
 
 def getWordAverageScore(rawData):
-    pass
+    answer=[]
+    for rowNum in range(len(rawData)):
+        for wordNum in range(len(rawData[rowNum]["sentence"])):
+            checkWord =0
+            for checkCount in range(len(answer)):
+                if(rawData[rowNum]["sentence"][wordNum]==answer[checkCount]["word"]):
+                    checkWord=1
+                    answer[checkCount]["total"]+=rawData[rowNum]["sentiment"]
+                    answer[checkCount]["index"]+=1
+                    break
+            if(checkWord==0):
+                answerDic={"word":rawData[rowNum]["sentence"][wordNum],"total":rawData[rowNum]["sentiment"],"index":1}
+                length = len(answer)
+                answer.append(answerDic)
+    returnAnswer={}    
+    for i in answer:
+        average= i["total"]/i["index"]
+        returnAnswer[i["word"]]=average
+
+    return returnAnswer
