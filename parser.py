@@ -210,7 +210,6 @@ def main(argv):
             # Now bag of words is ready for feature construction
             bagOfWords = getBagOfWords(rawData)
             matrix2 = generator.createFeatureBagMatrix(rawData)
-            
         stats.report(invertedRawData)
         # extract the bigrams from inverted raw data
         bigramsInvertedCollection = bigram.extractBigramsFromInvertedRawData(invertedRawData)
@@ -230,8 +229,12 @@ def main(argv):
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
         print(type(splitedBigramRawData))
         print(type(freqDist))
+<<<<<<< HEAD
         #matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
        
+=======
+        matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
+>>>>>>> b273fafabd893b17348f0e9afa079233725133e5
         #splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
 
         #matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
