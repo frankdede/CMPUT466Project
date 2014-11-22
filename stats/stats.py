@@ -40,16 +40,16 @@ def report(invertedRawData):
     print("========================================")
 
 
-def getWordAverageScore(rawData):
-    answer=[]
-    for entry in range(len(rawData)):
+def getWordAverageSentiment(rawData):
+    answer= {}
+    for entry in rawData:
         sentiment = entry['sentiment']
-        for token in range(len(entry["sentence"])):
+        for token in entry['sentence']:
             if token in answer:
-                answer[token].append(score)
+                answer[token].append(sentiment)
             else:
-                answer[token] = [score]
+                answer[token] = [sentiment]
     for i in answer:
-        answer(i) = sum(answer[i])/len(answer[i])
+        answer[i] = sum(answer[i])/float(len(answer[i]))
 
     return answer
