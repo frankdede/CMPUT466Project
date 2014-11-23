@@ -1,11 +1,20 @@
 #!/usr/bin/python
 
-import sys, getopt, exceptions, re
+import sys, getopt, exceptions, re, time 
 import json
 from bigram import bigram
 from unigram import unigram
 from stats import stats
-from tools import splitter,generator
+from tools import splitter, generator ,out
+
+def timeExec(func):
+    def wrapper(*arg):
+        start = time.clock()
+        a = func(*arg)
+        end =time.clock()
+        print 'used:', end - start
+        return a
+    return wrapper
 
 def writeFile(name,content):
     print("====== Writing '"+ name +"' to the disk ======")
@@ -13,10 +22,10 @@ def writeFile(name,content):
     output.write(content)
     output.close()    
     print("Done")
-
+    
 def createStopWordsList(text):
     stopWordsList = []
-    #return map(lambda x:line.strip('\n').split(),text)
+
     for line in text:
         stopWordsList.extend(line.strip('\n').split(' '))
     return stopWordsList
@@ -54,7 +63,7 @@ def extractRawData(text,stopWords = None):
     print("Done")
     return rawData
         
-
+#@timeExec
 def createInvertedRawData(text, stopWords = None):
     invertedRawData = {}
     text.readline()
@@ -102,26 +111,14 @@ def createInvertedRawData(text, stopWords = None):
             invertedRawData[sentiment] = []
             invertedRawData[sentiment].append(entry)
     print("Done")
+    print len(invertedRawData)
     return invertedRawData
 
 
-def getBagOfWords(rawData):
-    bag = []
-    for entry in rawData:
-        for word in entry['sentence']:
-            #print entry['sentence']
-            bag.append(word)
-
-    print bag
-    return bag
-
 
 def stripWords(sentenceTokens,wordsList):
-# suggestion: return filter(lambda x:x not in wordsList)
-    for word in wordsList:
-        if word in sentenceTokens:
-            sentenceTokens.remove(word)
-    return sentenceTokens
+
+    return filter(lambda x: x not in wordsList, sentenceTokens)
 
 def readArgsFromInput(argv):
     rawDataName = stopWordsName = outputName = directory = None 
@@ -199,6 +196,7 @@ def main(argv):
 
             # create invertedRawData
             invertedRawData = createInvertedRawData(rawDataFile,stopWordsList)
+
             rawDataFile.close()
 
             rawDataFile = open(rawDataName,'r')
@@ -207,10 +205,14 @@ def main(argv):
             rawData = extractRawData(rawDataFile,stopWordsList)
             rawDataFile.close()
 
+            average = stats.getWordAverageSentiment(rawData)
+            print average
+            out.saveWordSentiment(average,"average.txt")
             # Now bag of words is ready for feature construction
-            bagOfWords = getBagOfWords(rawData)
-
-        stats.report(invertedRawData)
+            '''
+            matrix2 = generator.createFeatureBagMatrix(rawData)
+            '''
+        # stats.report(invertedRawData)
         # extract the bigrams from inverted raw data
         bigramsInvertedCollection = bigram.extractBigramsFromInvertedRawData(invertedRawData)
         freqDist = bigram.getFrequencyDist(bigramsInvertedCollection)
@@ -221,15 +223,15 @@ def main(argv):
         
         # extract the bigrams from raw data
         bigramsRawData = bigram.extractBigramsFromRawData(rawData)
-        # print(bigramsRawData)
-        # print(len(bigramsRawData))
 
         # bigram sentences by n 
 
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
-        print(type(splitedBigramRawData))
-        print(type(freqDist))
+
+        # matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
+        '''
         matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
+        '''
         #splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
 
         #matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
