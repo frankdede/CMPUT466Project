@@ -1,9 +1,10 @@
 #!/usr/bin/python
+import operator
 
 def lenLongestSentence(invertedRawData):
     longestLen = 0
-#!/usr/bin/python
     for sentiment in invertedRawData:
+        print sentiment
         for entry in invertedRawData[sentiment]:
             if len(entry["sentence"]) > longestLen:
                 longestLen = len(entry["sentence"])
@@ -40,24 +41,19 @@ def report(invertedRawData):
     print("========================================")
 
 
-def getWordAverageScore(rawData):
-    answer=[]
-    for rowNum in range(len(rawData)):
-        for wordNum in range(len(rawData[rowNum]["sentence"])):
-            checkWord =0
-            for checkCount in range(len(answer)):
-                if(rawData[rowNum]["sentence"][wordNum]==answer[checkCount]["word"]):
-                    checkWord=1
-                    answer[checkCount]["total"]+=rawData[rowNum]["sentiment"]
-                    answer[checkCount]["index"]+=1
-                    break
-            if(checkWord==0):
-                answerDic={"word":rawData[rowNum]["sentence"][wordNum],"total":rawData[rowNum]["sentiment"],"index":1}
-                length = len(answer)
-                answer.append(answerDic)
-    returnAnswer={}    
+def getWordAverageSentiment(rawData):
+    answer = {}
+    for entry in rawData:
+        sentiment = entry['sentiment']
+        for token in entry['sentence']:
+            if token in answer:
+                answer[token].append(sentiment)
+            else:
+                answer[token] = [sentiment]
     for i in answer:
-        average= i["total"]/i["index"]
-        returnAnswer[i["word"]]=average
 
-    return returnAnswer
+        answer[i] = [sum(answer[i])/float(len(answer[i])),len(answer[i])]
+
+    print answer
+    sortedAvg = sorted(answer.items(), key=lambda (k, v): v[1], reverse = True)
+    return sortedAvg
