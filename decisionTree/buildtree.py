@@ -16,14 +16,29 @@ import numpy as np
 
 class tree_builder:
 
-    def __init__(self):
+    def __init__(self, depth = -1):
         """Init the tree."""
-        self.tree = tree.DecisionTreeClassifier()
+        if depth > 0:
+            self.tree = tree.DecisionTreeClassifier(max_depth=depth)
+        else:
+            self.tree = tree.DecisionTreeClassifier()
         self.data = [] 
         self.attr = {}
         self.dot_data = StringIO()
+        self.trained = False
     
+    def dump_tree(self, path):
+        '''Dump the tree object to path'''
+        from sklearn.externals import joblib
+        joblib.dump(self.tree, path)
+    
+    def classerify(self, x):
+        assert self.trained is True , "You need train data first!"
+        return self.tree.predict(x)
+
     def build_fit_data(self):
+        if self.trained == True:
+            return 
         for item in self.attr:
             index = self.attr[item]['order']
             if self.attr[item]['reverse']:
@@ -37,17 +52,29 @@ class tree_builder:
             elif self.attr[item]['type'] == 'DOUBLE':
                 for x in xrange(len(self.data)):
                     self.data[x][index] = float(self.data[x][index])
-            
 
-    def fit(self):
+        self.trained = True
+    
+    def fit_part(self, pos, length):
         self.build_fit_data()
+       
+        end = pos + length if length != -1 else None
+
         x_func = lambda x: x[:-1]
-        y_func = lambda x: x[-1:]
-        x = map(x_func, self.data)
-        y = map(y_func, self.data)
-        
+        y_func = lambda x: str( x[-1:])
+        x = map(x_func, self.data[pos:end])
+        y = map(y_func, self.data[pos:end])
+
         self.tree.fit(x, y)
 
+    def fit(self):
+        #self.build_fit_data()
+        #x_func = lambda x: x[:-1]
+        #y_func = lambda x: str( x[-1:])
+        #x = map(x_func, self.data)
+        #y = map(y_func, self.data)
+        
+        return self.fit_part(0, -1) 
 
     def load_data_from_file(self, path):
         """load data from file"""
@@ -139,6 +166,8 @@ class tree_builder:
         os.popen("curl -d '%s' https://chart.googleapis.com/chart -o %s"
                 %( post, path))
 
+
+
 def main():
 
     parser = argparse.ArgumentParser(description='Build Tree and output tree \
@@ -146,11 +175,14 @@ def main():
 
     parser.add_argument('INPUT', nargs=1, help="Input data file")
     parser.add_argument("OUTPUT", nargs=1, help="Output tree graph pdf")
-    
+    parser.add_argument("-d",dest='depth', default=-1 , help="max depth", type=int)    
     args = parser.parse_args(sys.argv[1:])
-    t = tree_builder()
+     
+    t = tree_builder(args.depth)
     t.load_data_from_file(args.INPUT[0])
     t.fit()
+
+    t.dump_tree('./tree_dump/tree.pkl')
     t.plot_pdf(args.OUTPUT[0])
     #t.plot_png(args.OUTPUT[0])
         
