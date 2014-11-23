@@ -1,9 +1,10 @@
 #!/usr/bin/python
+import operator
 
 def lenLongestSentence(invertedRawData):
     longestLen = 0
-#!/usr/bin/python
     for sentiment in invertedRawData:
+        print sentiment
         for entry in invertedRawData[sentiment]:
             if len(entry["sentence"]) > longestLen:
                 longestLen = len(entry["sentence"])
@@ -41,7 +42,7 @@ def report(invertedRawData):
 
 
 def getWordAverageSentiment(rawData):
-    answer= {}
+    answer = {}
     for entry in rawData:
         sentiment = entry['sentiment']
         for token in entry['sentence']:
@@ -50,6 +51,9 @@ def getWordAverageSentiment(rawData):
             else:
                 answer[token] = [sentiment]
     for i in answer:
-        answer[i] = sum(answer[i])/float(len(answer[i]))
 
-    return answer
+        answer[i] = [sum(answer[i])/float(len(answer[i])),len(answer[i])]
+
+    print answer
+    sortedAvg = sorted(answer.items(), key=lambda (k, v): v[1], reverse = True)
+    return sortedAvg

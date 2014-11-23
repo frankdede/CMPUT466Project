@@ -1,18 +1,19 @@
 #!/usr/bin/python
 
-import sys, getopt, exceptions, re, time
+import sys, getopt, exceptions, re, time 
 import json
 from bigram import bigram
 from unigram import unigram
 from stats import stats
-from tools import splitter,generator
+from tools import splitter, generator ,out
 
 def timeExec(func):
     def wrapper(*arg):
         start = time.clock()
-        func(*arg)
+        a = func(*arg)
         end =time.clock()
         print 'used:', end - start
+        return a
     return wrapper
 
 def writeFile(name,content):
@@ -62,7 +63,7 @@ def extractRawData(text,stopWords = None):
     print("Done")
     return rawData
         
-@timeExec
+#@timeExec
 def createInvertedRawData(text, stopWords = None):
     invertedRawData = {}
     text.readline()
@@ -110,7 +111,9 @@ def createInvertedRawData(text, stopWords = None):
             invertedRawData[sentiment] = []
             invertedRawData[sentiment].append(entry)
     print("Done")
+    print len(invertedRawData)
     return invertedRawData
+
 
 
 def stripWords(sentenceTokens,wordsList):
@@ -193,6 +196,7 @@ def main(argv):
 
             # create invertedRawData
             invertedRawData = createInvertedRawData(rawDataFile,stopWordsList)
+
             rawDataFile.close()
 
             rawDataFile = open(rawDataName,'r')
@@ -203,10 +207,12 @@ def main(argv):
 
             average = stats.getWordAverageSentiment(rawData)
             print average
+            out.saveWordSentiment(average,"average.txt")
             # Now bag of words is ready for feature construction
-            # matrix2 = generator.createFeatureBagMatrix(rawData)
-
-        stats.report(invertedRawData)
+            '''
+            matrix2 = generator.createFeatureBagMatrix(rawData)
+            '''
+        # stats.report(invertedRawData)
         # extract the bigrams from inverted raw data
         bigramsInvertedCollection = bigram.extractBigramsFromInvertedRawData(invertedRawData)
         freqDist = bigram.getFrequencyDist(bigramsInvertedCollection)
@@ -222,10 +228,10 @@ def main(argv):
 
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
 
-        #matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
-       
+        # matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
+        '''
         matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
-
+        '''
         #splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
 
         #matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
