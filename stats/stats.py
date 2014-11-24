@@ -33,7 +33,7 @@ def report(invertedRawData):
     longestLength = lenLongestSentence(invertedRawData)
     count = countForEachSentiment(invertedRawData)
     average = getAvgSentenceLengthOfRawData(invertedRawData)
-    print("============== Statistics ==============")
+    
     print("Longest Sentence:"+ str(longestLength))
     for sentiment in count:
         print("Sentiment:" + str(sentiment) + " has "+ str(count[sentiment]) +" lines of sentence")
@@ -42,6 +42,7 @@ def report(invertedRawData):
 
 
 def getWordAverageSentiment(rawData, threshold):
+    print("============== Getting Word Average Sentiment ==============")
     answer = {}
     for entry in rawData:
         sentiment = entry['sentiment']
@@ -51,9 +52,9 @@ def getWordAverageSentiment(rawData, threshold):
             else:
                 answer[token] = [sentiment]
     answer = {k :v for k, v in answer.items() if len(v) > threshold}
-    print answer
     for i in answer:
         answer[i] = [sum(answer[i])/float(len(answer[i])),len(answer[i])]
 
     sortedAvg = sorted(answer.items(), key=lambda (k, v): v[1], reverse = True)
+    print("Done")
     return sortedAvg

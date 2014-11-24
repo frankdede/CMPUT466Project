@@ -6,6 +6,7 @@ from bigram import bigram
 from unigram import unigram
 from stats import stats
 from tools import splitter, generator ,out
+from nltk.stem.lancaster import LancasterStemmer
 
 def timeExec(func):
     def wrapper(*arg):
@@ -32,6 +33,7 @@ def createStopWordsList(text):
 
 
 def extractRawData(text,stopWords = None):
+    st = LancasterStemmer()
     rawData = []
     text.readline()
     print("********** Skipped the first line **********")
@@ -54,6 +56,8 @@ def extractRawData(text,stopWords = None):
             sentenceStr = lineTokens[2]
             sentiment = int(lineTokens[3])
             sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
+            sentenceTokens = map(lambda x:x.lower(),sentenceTokens)
+            sentenceTokens = map(lambda x:st.stem(x),sentenceTokens)
             # if stopwords are required, do the following
             if stopWords:
                 sentenceTokens = stripWords(sentenceTokens,stopWords)
@@ -65,6 +69,8 @@ def extractRawData(text,stopWords = None):
         
 #@timeExec
 def createInvertedRawData(text, stopWords = None):
+    st = LancasterStemmer()
+
     invertedRawData = {}
     text.readline()
     print("********** Skipped the first line **********")
@@ -97,6 +103,10 @@ def createInvertedRawData(text, stopWords = None):
         # then split
         sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
 
+        sentenceTokens = map(lambda x:x.lower(),sentenceTokens)
+        sentenceTokens = map(lambda x:st.stem(x),sentenceTokens)
+        #print(sentenceTokens)
+
         # if stopwords are required, do the following
         if stopWords:
             sentenceTokens = stripWords(sentenceTokens,stopWords)
@@ -111,7 +121,6 @@ def createInvertedRawData(text, stopWords = None):
             invertedRawData[sentiment] = []
             invertedRawData[sentiment].append(entry)
     print("Done")
-    print len(invertedRawData)
     return invertedRawData
 
 
@@ -206,12 +215,12 @@ def main(argv):
             rawDataFile.close()
 
             average = stats.getWordAverageSentiment(rawData, 2)
-            print average
+
             out.saveWordSentiment(average,"average.txt")
+            
             # Now bag of words is ready for feature construction
-            '''
             matrix2 = generator.createFeatureBagMatrix(rawData)
-            '''
+            
         # stats.report(invertedRawData)
         # extract the bigrams from inverted raw data
         bigramsInvertedCollection = bigram.extractBigramsFromInvertedRawData(invertedRawData)
@@ -228,14 +237,9 @@ def main(argv):
 
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
 
-        # matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
-        '''
+        
         matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
-        '''
-        #splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
-
-        #matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
-
+        
         # dump all the data
         #jsonInvertedRawData = json.dumps(invertedRawData)
         #jsonBigrams = json.dumps(bigramsInvertedCollection)

@@ -4,11 +4,11 @@ import numpy
 
 def createFreqMatrix(n,splitedRawData,freqLookupData):
 
-    #size = (len(splitedRawData),n+1)
-    size = 500
+    size = (len(splitedRawData))
+    #size = 500
     freqMatrix = numpy.zeros(size,dtype = ('f4,f4,f4,a1'))
 
-    for entry in range(500):
+    for entry in range(len(splitedRawData)):
         size = (1,len(splitedRawData[entry]['sentence']))
         for part in range(len(splitedRawData[entry]['sentence'])):
             total = 0;
@@ -21,7 +21,6 @@ def createFreqMatrix(n,splitedRawData,freqLookupData):
                 values = [f0,f1,f2,f3,f4]
                 # find the highest value
                 highestSentiment = values.index(max(values))
-
             # sum up
             total += highestSentiment
             # get 
@@ -29,17 +28,17 @@ def createFreqMatrix(n,splitedRawData,freqLookupData):
             freqMatrix[entry][part] = partAverage
         
         freqMatrix[entry][n] = str(splitedRawData[entry]['sentiment'])
-        #print(entry,freqMatrix[entry][n])
+        print(entry,freqMatrix[entry][n])
     saveMatrix(freqMatrix)
-#
+
 def createFeatureBagMatrix(splitedRawData):
     totalLabelSet = set()
     for sentence in splitedRawData:
         totalLabelSet = totalLabelSet.union(set(sentence['sentence']))
+    listFeatures = listFeatures[:1000]
     matrix_list= list()
     for sentence in splitedRawData:
-        #print(sentence)
-        tmp = map(lambda x:1 if x in sentence['sentence'] else 0,totalLabelSet)
+        tmp = map(lambda x:1 if x in sentence['sentence'] else 0,listFeatures)
         tmp.append(sentence["sentiment"])
         matrix_list.append(tmp)
     matrix_array = numpy.array(matrix_list)

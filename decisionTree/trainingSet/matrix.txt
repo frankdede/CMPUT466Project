@@ -1,3 +1,10 @@
+@attribute
+part1|DOUBLE|
+part2|DOUBLE|
+part3|DOUBLE|
+sentiment|STRING|{0,1,2,3,4}
+
+@data
 0.666667,0.666667,0.666667,1
 1.33333,1.33333,1.33333,4
 0.666667,0.333333,0.0,1
