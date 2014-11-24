@@ -205,7 +205,7 @@ def main(argv):
             rawData = extractRawData(rawDataFile,stopWordsList)
             rawDataFile.close()
 
-            average = stats.getWordAverageSentiment(rawData)
+            average = stats.getWordAverageSentiment(rawData, 2)
             print average
             out.saveWordSentiment(average,"average.txt")
             # Now bag of words is ready for feature construction

@@ -41,7 +41,7 @@ def report(invertedRawData):
     print("========================================")
 
 
-def getWordAverageSentiment(rawData):
+def getWordAverageSentiment(rawData, threshold):
     answer = {}
     for entry in rawData:
         sentiment = entry['sentiment']
@@ -50,10 +50,10 @@ def getWordAverageSentiment(rawData):
                 answer[token].append(sentiment)
             else:
                 answer[token] = [sentiment]
+    answer = {k :v for k, v in answer.items() if len(v) > threshold}
+    print answer
     for i in answer:
-
         answer[i] = [sum(answer[i])/float(len(answer[i])),len(answer[i])]
 
-    print answer
     sortedAvg = sorted(answer.items(), key=lambda (k, v): v[1], reverse = True)
     return sortedAvg

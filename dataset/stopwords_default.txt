@@ -171,6 +171,11 @@ your
 yours
 yourself
 yourselves
+'
+'s
+I
+`
+‘
 ,
 .
 :
