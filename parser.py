@@ -104,7 +104,9 @@ def createInvertedRawData(text, stopWords = None):
         sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
 
         sentenceTokens = map(lambda x:x.lower(),sentenceTokens)
+        
         sentenceTokens = map(lambda x:st.stem(x),sentenceTokens)
+
         #print(sentenceTokens)
 
         # if stopwords are required, do the following
@@ -126,7 +128,7 @@ def createInvertedRawData(text, stopWords = None):
 
 
 def stripWords(sentenceTokens,wordsList):
-
+    
     return filter(lambda x: x not in wordsList, sentenceTokens)
 
 def readArgsFromInput(argv):
