@@ -5,7 +5,7 @@ import numpy
 def createFreqMatrix(n,splitedRawData,freqLookupData):
 
     size = (len(splitedRawData))
-    #size = 500
+    
     freqMatrix = numpy.zeros(size,dtype = ('f4,f4,f4,a1'))
 
     for entry in range(len(splitedRawData)):
@@ -35,10 +35,10 @@ def createFeatureBagMatrix(splitedRawData):
     totalLabelSet = set()
     for sentence in splitedRawData:
         totalLabelSet = totalLabelSet.union(set(sentence['sentence']))
-    listFeatures = listFeatures[:1000]
+    #listFeatures = listFeatures[:1000]
     matrix_list= list()
     for sentence in splitedRawData:
-        tmp = map(lambda x:1 if x in sentence['sentence'] else 0,listFeatures)
+        tmp = map(lambda x:1 if x in sentence['sentence'] else 0,totalLabelSet)
         tmp.append(sentence["sentiment"])
         matrix_list.append(tmp)
     matrix_array = numpy.array(matrix_list)
