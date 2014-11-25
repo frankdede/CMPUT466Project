@@ -28,7 +28,7 @@ def createStopWordsList(text):
     stopWordsList = []
 
     for line in text:
-        stopWordsList.extend(line.strip('\n').split(' '))
+        stopWordsList.extend(unicode(line, errors='ignore').strip('\n').split())
     return stopWordsList
 
 
@@ -56,10 +56,13 @@ def extractRawData(text,stopWords = None):
             sentenceStr = lineTokens[2]
             sentiment = int(lineTokens[3])
             sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
-            sentenceTokens = map(lambda x:x.lower(),sentenceTokens)
-            sentenceTokens = map(lambda x:st.stem(x),sentenceTokens)
+            sentenceTokens = map(lambda x:unicode(x.lower()),sentenceTokens)
+            sentenceTokens = map(lambda x:unicode(st.stem(x)),sentenceTokens)
             # if stopwords are required, do the following
+            #print("-------------")
+            #print(sentenceTokens)
             if stopWords:
+                #print(sentenceTokens)
                 sentenceTokens = stripWords(sentenceTokens,stopWords)
             entry = {"sentenceId":sentenceId,"sentence":sentenceTokens,"sentiment":sentiment}
             rawData.append(entry)
@@ -101,16 +104,19 @@ def createInvertedRawData(text, stopWords = None):
 
         # replace one or more spaces by single space
         # then split
-        sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
+        sentenceTokens = re.sub("\s+"," ",sentenceStr).split()
 
-        sentenceTokens = map(lambda x:x.lower(),sentenceTokens)
+        sentenceTokens = map(lambda x:unicode(x.lower()),sentenceTokens)
         
-        sentenceTokens = map(lambda x:st.stem(x),sentenceTokens)
-
+        sentenceTokens = map(lambda x:unicode(st.stem(x)),sentenceTokens)
+        stopWords = map(lambda x:unicode(x),stopWords)
         #print(sentenceTokens)
-
+        #print("-------------")
+        #print(sentenceTokens)
+        #print("-------------")
         # if stopwords are required, do the following
         if stopWords:
+            #sys.stderr.write(str(sentenceTokens))
             sentenceTokens = stripWords(sentenceTokens,stopWords)
         
         # create a sentiment key if doesn't exist
