@@ -45,4 +45,4 @@ def getWordAverageSentiment(rawData, threshold):
 
     sortedAvg = sorted(answer.items(), key=lambda (k, v): v[1], reverse = True)
     print("Done")
-    return sortedAvg
+    return sortedAvg, list(answer.keys())

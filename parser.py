@@ -40,9 +40,16 @@ def extractRawData(text, stopWords, stemming):
     print("********** Creating Raw Data **********")
 
     if stopWords:
-        signal = 'ON'
+        sign = 'ON'
     else:
-        signal = 'OFF'
+        sign = 'OFF'
+    print("Strip Stop-words:" + sign)
+
+    if stemming:
+        sign = 'ON'
+    else:
+        sign = 'OFF'
+    print("Stemming:" + sign)
 
     prevId = 0
 
@@ -81,11 +88,16 @@ def createInvertedRawData(text, stopWords, stemming):
     print("********** Creating Inverted Raw Data **********")
     
     if stopWords:
-        signal = 'ON'
+        sign = 'ON'
     else:
-        signal = 'OFF'
+        sign = 'OFF'
+    print("Strip Stop-words:" + sign)
 
-    print("Strip Stop-words:" + signal)
+    if stemming:
+        sign = 'ON'
+    else:
+        sign = 'OFF'
+    print("Stemming:" + sign)
 
     for line in text:
         # Split line
@@ -207,14 +219,13 @@ def main(argv):
         rawData = extractRawData(rawDataFile,stopWordsList,stemming)
         rawDataFile.close()
 
-        average = stats.getWordAverageSentiment(rawData, 2)
+        average,featuresList = stats.getWordAverageSentiment(rawData, 2)
 
         out.saveWordSentiment(average,"average.txt")
             
         # Now bag of words is ready for feature construction
-        #matrix2 = generator.createFeatureBagMatrix(rawData)
-            
-        # stats.report(invertedRawData)
+        matrix2 = generator.createFeatureBagMatrix(rawData,featuresList)
+        
         # extract the bigrams from inverted raw data
         bigramsInvertedCollection = bigram.extractBigramsFromInvertedRawData(invertedRawData)
         freqDist = bigram.getFrequencyDist(bigramsInvertedCollection)
