@@ -40,6 +40,7 @@ def createFeatureBagMatrix(splitedRawData,totalLabelSet=None):
     header.write("@attribute\n");
     map(lambda x:header.write(x+"|DOUBLE|\n"),totalLabelSet)
     header.write("sentiment|DOUBLE|{0,1,2,3,4}\n");
+    header.write("\n@data\n");
     matrix_list= list()
     for sentence in splitedRawData:
         tmp = map(lambda x:1 if x in sentence['sentence'] else 0,totalLabelSet)
