@@ -32,7 +32,10 @@ def get_accuray_socre(t, pos, length, size):
         if real_r == pref_r:
             right += 1
 
-        wrong_set[real_r][pref_r] += 1
+        try:
+            wrong_set[real_r][pref_r] += 1
+        except:
+            print r, real_r, pref_r
 
     accuracy = right / (data_length - length)
     return (accuracy, wrong_set)

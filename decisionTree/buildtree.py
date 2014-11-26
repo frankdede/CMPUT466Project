@@ -153,6 +153,9 @@ class tree_builder:
 
     def plot_pdf(self, path):
         self.build_polt()
+
+        c = open(".tmp.dot", 'w')
+        c.write(self.dot_data.getvalue())
         graph = pydot.graph_from_dot_data(self.dot_data.getvalue())
         graph.write_pdf(path)
 

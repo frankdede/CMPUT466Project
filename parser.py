@@ -100,8 +100,9 @@ def extractRawTestData(text):
     print("Done")
     return testData
 
-def createInvertedTestData():
-    pass
+def createInvertedTestData(text):
+    createInvertedTrainingData(text, None, None);
+
 
 def createInvertedTrainingData(text, stopWords, stemming):
     st = LancasterStemmer()
@@ -247,7 +248,7 @@ def main(argv):
         out.saveWordSentiment(average,"average.txt")
             
         # Now bag of words is ready for feature construction
-        #generator.createFeatureBagMatrix(rawData,featuresList)
+        generator.createFeatureBagMatrix(rawTrainingData,featuresList)
         
         # extract the bigrams from inverted raw data
         bigramsInvertedCollection = bigram.extractBigramsFromInvertedRawData(invertedRawData)
@@ -265,7 +266,7 @@ def main(argv):
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
 
         
-        generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
+        #generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
         
         # dump all the data
         #jsonInvertedRawData = json.dumps(invertedRawData)
