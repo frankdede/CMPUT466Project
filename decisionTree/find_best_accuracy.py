@@ -95,12 +95,13 @@ def main():
         r = mk_test(t, i)
         m = max(r['accuracy'])
         index = r['accuracy'].index(m) + 1
-        print "\nsplit data into %02d fregment has high score %f with freg %d" % (i, m, index)
+        print "\nsplit data into %02d fregment has high score %f with freg %d"\
+            % (i, m, index)
         print_wrong_matrix(r['error_set'][index - 1])
 
-        #freg_fit_result['i']['accuracy'] = m
-        #freg_fit_result['i']['index'] = index
-        #freg_fit_result['i']['freq'] = i
+        # freg_fit_result['i']['accuracy'] = m
+        # freg_fit_result['i']['index'] = index
+        # freg_fit_result['i']['freq'] = i
         if m > max_socre:
             max_socre = m
             max_socre_idx = i
