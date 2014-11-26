@@ -32,18 +32,17 @@ def createStopWordsList(text):
     return stopWordsList
 
 
-def extractRawData(text, stopWords, stemming):
+def extractRawTrainingData(text, stopWords, stemming):
     st = LancasterStemmer()
     rawData = []
     text.readline()
-    print("********** Skipped the first line **********")
-    print("********** Creating Raw Data **********")
+    print("********** Extract From Raw Training Data **********")
 
     if stopWords:
         sign = 'ON'
     else:
         sign = 'OFF'
-    print("Strip Stop-words:" + sign)
+    print("Stopwords:" + sign)
 
     if stemming:
         sign = 'ON'
@@ -52,7 +51,7 @@ def extractRawData(text, stopWords, stemming):
     print("Stemming:" + sign)
 
     prevId = 0
-
+    print("Extracting...")
     for line in text:
 
         lineTokens = line.strip('\n').split('\t')
@@ -79,25 +78,50 @@ def extractRawData(text, stopWords, stemming):
     return rawData
         
 #@timeExec
-def createInvertedRawData(text, stopWords, stemming):
+def extractRawTestData(text):
+
+    testData = []
+    text.readline()
+    print("********** Extracting From Raw Test Data **********")
+    print("Extracting...")
+    for line in text:
+
+        lineTokens = line.strip('\n').split('\t')
+
+        sentenceId = int(lineTokens[1])
+        sentenceStr = lineTokens[2]
+        sentiment = int(lineTokens[3])
+
+        sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
+        sentenceTokens = map(lambda x:unicode(x.lower()),sentenceTokens)
+        entry = {"sentenceId":sentenceId,"sentence":sentenceTokens,"sentiment":sentiment}
+        testData.append(entry)
+
+    print("Done")
+    return testData
+
+def createInvertedTestData():
+    pass
+
+def createInvertedTrainingData(text, stopWords, stemming):
     st = LancasterStemmer()
 
     invertedRawData = {}
     text.readline()
-    print("********** Skipped the first line **********")
-    print("********** Creating Inverted Raw Data **********")
+    print("********** Create Inverted Raw Training Data **********")
     
     if stopWords:
         sign = 'ON'
     else:
         sign = 'OFF'
-    print("Strip Stop-words:" + sign)
+    print("Stopwords:" + sign)
 
     if stemming:
         sign = 'ON'
     else:
         sign = 'OFF'
     print("Stemming:" + sign)
+    print("Creating...")
 
     for line in text:
         # Split line
@@ -210,20 +234,20 @@ def main(argv):
         else:
             stemming = False
 
-        invertedRawData = createInvertedRawData(rawDataFile,stopWordsList,stemming)
+        invertedRawData = createInvertedTrainingData(rawDataFile,stopWordsList,stemming)
         rawDataFile.close()
 
         rawDataFile = open(rawDataName,'r')
         # extract rawData from rawDataFile
-        rawData = extractRawData(rawDataFile,stopWordsList,stemming)
+        rawTrainingData = extractRawTrainingData(rawDataFile,stopWordsList,stemming)
         rawDataFile.close()
 
-        average,featuresList = stats.getWordAverageSentiment(rawData, 2)
+        average,featuresList = stats.getWordAverageSentiment(rawTrainingData, 2)
 
         out.saveWordSentiment(average,"average.txt")
             
         # Now bag of words is ready for feature construction
-        generator.createFeatureBagMatrix(rawData,featuresList)
+        #generator.createFeatureBagMatrix(rawData,featuresList)
         
         # extract the bigrams from inverted raw data
         bigramsInvertedCollection = bigram.extractBigramsFromInvertedRawData(invertedRawData)
@@ -234,7 +258,7 @@ def main(argv):
         unifreqDist = bigram.getFrequencyDist(unigramsInvertedCollection)
         
         # extract the bigrams from raw data
-        bigramsRawData = bigram.extractBigramsFromRawData(rawData)
+        bigramsRawData = bigram.extractBigramsFromRawData(rawTrainingData)
 
         # bigram sentences by n 
 

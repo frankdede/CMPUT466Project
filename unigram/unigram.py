@@ -6,7 +6,7 @@ def extractUnigramsFromInvertedRawData(invertedRawData):
     #print(invertedRawData[0])
     counter = 0
     for sentiment in invertedRawData.keys():
-        print("hello Processing sentiment " + str(sentiment) )
+        print("Processing sentiment " + str(sentiment) )
         if sentiment not in unigramCollection:
             unigramCollection[sentiment] = []
         for entry in invertedRawData[sentiment]:

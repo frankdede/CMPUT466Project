@@ -4,11 +4,24 @@ import numpy
 import StringIO
 from subprocess import call
 
-def createFreqMatrix(n,splitedRawData,freqLookupData):
-    print("====== Creating Frequency Training Set ======= ")
+def createFreqMatrix(n,splitedRawData,freqLookupData,isTestData = False):
+
+    dtype = 'f4,' * n
     size = (len(splitedRawData))
-    
-    freqMatrix = numpy.zeros(size,dtype = ('f4,f4,f4,a1'))
+
+    if isTestData:
+        print("============= Create Frequency Test Set ==============")
+        # exclude the last comma
+        dtype = dtype[0:-1]
+    else:
+        print("============== Create Frequency Training Set ==============")
+        # add a1 type to dtype
+        dtype = dtype + 'a1'
+
+    print("Creating...")
+
+    # create placeholder based on size and dtype info
+    freqMatrix = numpy.zeros(size,dtype = (dtype))
 
     for entry in range(len(splitedRawData)):
         size = (1,len(splitedRawData[entry]['sentence']))
@@ -21,22 +34,35 @@ def createFreqMatrix(n,splitedRawData,freqLookupData):
                 f3 = freqLookupData[3].freq(gram)
                 f4 = freqLookupData[4].freq(gram)
                 values = [f0,f1,f2,f3,f4]
+
                 # find the highest value
                 highestSentiment = values.index(max(values))
             # sum up
             total += highestSentiment
-            # get 
+
             partAverage = total/float(len(splitedRawData[entry]['sentence']))
             freqMatrix[entry][part] = partAverage
         
-        freqMatrix[entry][n] = str(splitedRawData[entry]['sentiment'])
-        print(entry,freqMatrix[entry][n])
-    
-    saveMatrix('freq_matrix', freqMatrix)
+        if not isTestData:
+            freqMatrix[entry][n] = str(splitedRawData[entry]['sentiment'])
+
+        # print(entry,freqMatrix[entry][n])
+    if not isTestData:
+        header = StringIO.StringIO()
+        header.write("@attribute\n");
+        for i in range(n):
+            header.write("part" + str(i+1)+"|DOUBLE|\n")
+        header.write("sentiment|STRING|{0,1,2,3,4}\n");
+        header.write("\n@data");
+
+        saveMatrix('freq_test', freqMatrix, header.getvalue())
+    else:
+        saveMatrix('freq_train', freqMatrix)
+
     print("Done")
 
 def createFeatureBagMatrix(splitedRawData,totalLabelSet=None):
-    print("============== Creating Bag of Words Matrix ==============")
+    print("============== Create Bag of Words Training Set ==============")
     header = StringIO.StringIO()
     if(totalLabelSet==None):
         totalLabelSet = set()
@@ -56,10 +82,10 @@ def createFeatureBagMatrix(splitedRawData,totalLabelSet=None):
     matrix_array = numpy.array(matrix_list)
     matrix = numpy.matrix(matrix_array)
     print(matrix.shape)
-    saveMatrix("bag_matrix", matrix, header.getvalue())
-    header.close()
-
     print("Done")
+    saveMatrix("bag_train", matrix, header.getvalue())
+    header.close()
+    
 
 def saveMatrix(fileName,matrix,header=None):
     print("~~~~~~~~~~~ Saving '" + fileName + "'~~~~~~~~~~~")
@@ -67,12 +93,15 @@ def saveMatrix(fileName,matrix,header=None):
         numpy.savetxt(fileName, matrix, delimiter=",",fmt="%s")
     else:
         numpy.savetxt(fileName, matrix, delimiter=",",header=header,fmt="%s")
-    removeHashTag(fileName,fileName + ".txt")
     print("Done")
+    removeHashTag(fileName,fileName + ".txt")
+    
 
 def removeHashTag(inputName, outputName):
-    print("~~~~~~~~~~~ Modifying '" + inputName + "'~~~~~~~~~~~")
-    call(["sed", "'s/# //'",inputName,">",outputName])
+    print("~~~~~~~~~~~ Removing Hash Tags From '" + inputName + "'~~~~~~~~~~~")
+    f = open(outputName,'w')
+    call(["sed", "s/# //",inputName], stdout = f)
+    print("Cleanning temporary files ...")
     call(["rm",inputName])
     print("Done")
 
