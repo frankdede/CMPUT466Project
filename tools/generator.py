@@ -35,10 +35,10 @@ def createFreqMatrix(n,splitedRawData,freqLookupData):
 
 def createFeatureBagMatrix(splitedRawData,totalLabelSet=None):
     print("============== Creating Bag of Words Matrix ==============")
-
+    header = StringIO.StringIO()
     if(totalLabelSet==None):
         totalLabelSet = set()
-        header = StringIO.StringIO()
+        #header = StringIO.StringIO()
         for sentence in splitedRawData:
             totalLabelSet = totalLabelSet.union(set(sentence['sentence']))
 
