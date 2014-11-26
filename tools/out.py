@@ -3,3 +3,9 @@ def saveWordSentiment(list,name):
         for entry in list:
             f.write("%s %f %d \n" %(entry[0],entry[1][0],entry[1][1]))
     f.close()
+
+def saveSentimentDistribution(dictionary, name):
+    list = []
+    for key in dictionary:
+        list.extend(dictionary[key])
+    

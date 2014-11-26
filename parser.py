@@ -212,7 +212,7 @@ def main(argv):
         out.saveWordSentiment(average,"average.txt")
             
         # Now bag of words is ready for feature construction
-        matrix2 = generator.createFeatureBagMatrix(rawData)
+        #matrix2 = generator.createFeatureBagMatrix(rawData)
             
         # stats.report(invertedRawData)
         # extract the bigrams from inverted raw data

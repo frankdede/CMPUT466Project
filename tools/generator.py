@@ -3,7 +3,7 @@ import nltk
 import numpy
 import StringIO
 def createFreqMatrix(n,splitedRawData,freqLookupData):
-
+    print("====== Creating Frequency Training Set ======= ")
     size = (len(splitedRawData))
     
     freqMatrix = numpy.zeros(size,dtype = ('f4,f4,f4,a1'))
@@ -52,6 +52,7 @@ def createFeatureBagMatrix(splitedRawData,totalLabelSet=None):
     saveMatrix("matrix2.txt",matrix,header.getvalue())
     header.close()
     return matrix
+
 def saveMatrix(fileName,matrix,header):
     if header is None:
         numpy.savetxt(fileName, matrix, delimiter=",",fmt="%s")

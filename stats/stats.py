@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import operator
+from tools import out
 
 def lenLongestSentence(invertedRawData):
     longestLen = 0
@@ -27,19 +28,6 @@ def getAvgSentenceLengthOfRawData(invertedRawData):
             count = count + 1
 
     return totalLen/count
-
-def report(invertedRawData):
-
-    longestLength = lenLongestSentence(invertedRawData)
-    count = countForEachSentiment(invertedRawData)
-    average = getAvgSentenceLengthOfRawData(invertedRawData)
-    
-    print("Longest Sentence:"+ str(longestLength))
-    for sentiment in count:
-        print("Sentiment:" + str(sentiment) + " has "+ str(count[sentiment]) +" lines of sentence")
-    print("Average Sentiment Length:" + str(average)) 
-    print("========================================")
-
 
 def getWordAverageSentiment(rawData, threshold):
     print("============== Getting Word Average Sentiment ==============")
