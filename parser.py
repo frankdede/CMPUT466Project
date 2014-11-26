@@ -28,11 +28,11 @@ def createStopWordsList(text):
     stopWordsList = []
 
     for line in text:
-        stopWordsList.extend(line.strip('\n').split(' '))
+        stopWordsList.extend(unicode(line, errors='ignore').strip('\n').split())
     return stopWordsList
 
 
-def extractRawData(text,stopWords = None):
+def extractRawData(text, stopWords, stemming):
     st = LancasterStemmer()
     rawData = []
     text.readline()
@@ -52,15 +52,19 @@ def extractRawData(text,stopWords = None):
         sentenceId = int(lineTokens[1])
 
         if sentenceId > prevId:
+
             prevId = sentenceId
             sentenceStr = lineTokens[2]
             sentiment = int(lineTokens[3])
+
             sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
-            sentenceTokens = map(lambda x:x.lower(),sentenceTokens)
-            sentenceTokens = map(lambda x:st.stem(x),sentenceTokens)
-            # if stopwords are required, do the following
-            if stopWords:
-                sentenceTokens = stripWords(sentenceTokens,stopWords)
+
+            if stemming:
+                sentenceTokens = map(lambda x:unicode(st.stem(x).lower()),sentenceTokens)
+            else:
+                sentenceTokens = map(lambda x:unicode(x.lower()),sentenceTokens)
+
+            sentenceTokens = stripWords(sentenceTokens,stopWords)
             entry = {"sentenceId":sentenceId,"sentence":sentenceTokens,"sentiment":sentiment}
             rawData.append(entry)
 
@@ -68,7 +72,7 @@ def extractRawData(text,stopWords = None):
     return rawData
         
 #@timeExec
-def createInvertedRawData(text, stopWords = None):
+def createInvertedRawData(text, stopWords, stemming):
     st = LancasterStemmer()
 
     invertedRawData = {}
@@ -101,17 +105,14 @@ def createInvertedRawData(text, stopWords = None):
 
         # replace one or more spaces by single space
         # then split
-        sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
-
-        sentenceTokens = map(lambda x:x.lower(),sentenceTokens)
+        sentenceTokens = re.sub("\s+"," ",sentenceStr).split()
         
-        sentenceTokens = map(lambda x:st.stem(x),sentenceTokens)
+        if stemming:
+            sentenceTokens = map(lambda x:unicode(st.stem(x).lower()),sentenceTokens)
+        else:
+            sentenceTokens = map(lambda x:unicode(x.lower()),sentenceTokens)
 
-        #print(sentenceTokens)
-
-        # if stopwords are required, do the following
-        if stopWords:
-            sentenceTokens = stripWords(sentenceTokens,stopWords)
+        sentenceTokens = stripWords(sentenceTokens,stopWords)
         
         # create a sentiment key if doesn't exist
         entry = {"pharseId":pharseId,"sentenceId":sentenceId,"sentence":sentenceTokens}
@@ -136,7 +137,7 @@ def readArgsFromInput(argv):
     # Record the flags that user are using
     usedOpts = []
     try:
-        opts, args = getopt.getopt(argv,"hr:s:i1o",["rawdata=","stopwords=","ouput="])
+        opts, args = getopt.getopt(argv,"hr:s:mio:",["rawdata=","stopwords=","ouput="])
     except getopt.GetoptError:
         print 'run parser.py with flag -h to get help doc' 
         sys.exit()
@@ -146,8 +147,8 @@ def readArgsFromInput(argv):
             print '-h Help' 
             print '-r <rawdata_filename> Import raw data file' 
             print '-s <stopwords_filename> Import stopwords file'
+            print '-m Stemming enabled'
             print "-o <outputfile_filename> Define the name of output file.(It's named as no_stopwords.txt by default)"
-            print '-1 Mode 1: Process raw data without stripping the stopwords'
             sys.exit()
 
         elif opt in ("-r","--rawdata"):
@@ -158,6 +159,9 @@ def readArgsFromInput(argv):
             stopWordsName = arg
             usedOpts.append('-s')
 
+        elif opt in ("-m","--stemming"):
+            usedOpts.append('-m')
+
         elif opt in ("-o","--output"):
             outputName = arg
             usedOpts.append('-o')
@@ -166,10 +170,6 @@ def readArgsFromInput(argv):
             usedOpts.append('-i')
             # TODO:export stats images
             pass
-        elif opt in ("-1"):
-            usedOpts.append('-1')
-            # TODO:Mode 1 -- Process raw data without stripping the stopwords
-            pass 
         else:
             sys.exit("Invalid Flag(s)")
 
@@ -178,8 +178,8 @@ def readArgsFromInput(argv):
         outputName = 'default_invertedRawdata.json'
 
     # cannot proceed without filename of raw data
-    if rawDataName == None:
-        sys.exit("Cannot proceed wihout the filename of raw data")
+    if rawDataName == None or stopWordsName == None:
+        sys.exit("Cannot proceed wihout the raw data and/or stopwords")
 
     return rawDataName, stopWordsName, outputName, usedOpts
 
@@ -189,39 +189,30 @@ def main(argv):
     # load raw data
     try:
         rawDataFile = open(rawDataName,'r')
-        
-        # parser is in mode 1 then prcoess raw data without stripping the stopwords
-        if '-1' in usedOpts:
-            invertedRawData = createInvertedRawData(rawDataFile)
-            rawDataFile.close()
+        stopWordsFile = open(stopWordsName,'r')
 
-            rawDataFile = open(rawDataName,'r')
-            rawData = extractRawData(rawDataFile)
-            rawDataFile.close()
-
+        # create stopwords list
+        stopWordsList = createStopWordsList(stopWordsFile)
+        # create invertedRawData
+        if '-m' in usedOpts:
+            stemming = True
         else:
-            stopWordsFile = open(stopWordsName,'r')
+            stemming = False
 
-            # create stopwords list
-            stopWordsList = createStopWordsList(stopWordsFile)
+        invertedRawData = createInvertedRawData(rawDataFile,stopWordsList,stemming)
+        rawDataFile.close()
 
-            # create invertedRawData
-            invertedRawData = createInvertedRawData(rawDataFile,stopWordsList)
+        rawDataFile = open(rawDataName,'r')
+        # extract rawData from rawDataFile
+        rawData = extractRawData(rawDataFile,stopWordsList,stemming)
+        rawDataFile.close()
 
-            rawDataFile.close()
+        average = stats.getWordAverageSentiment(rawData, 2)
 
-            rawDataFile = open(rawDataName,'r')
-
-            # extract rawData from rawDataFile
-            rawData = extractRawData(rawDataFile,stopWordsList)
-            rawDataFile.close()
-
-            average = stats.getWordAverageSentiment(rawData, 2)
-
-            out.saveWordSentiment(average,"average.txt")
+        out.saveWordSentiment(average,"average.txt")
             
-            # Now bag of words is ready for feature construction
-            matrix2 = generator.createFeatureBagMatrix(rawData)
+        # Now bag of words is ready for feature construction
+        matrix2 = generator.createFeatureBagMatrix(rawData)
             
         # stats.report(invertedRawData)
         # extract the bigrams from inverted raw data
@@ -240,7 +231,7 @@ def main(argv):
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
 
         
-        matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
+        #matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
         
         # dump all the data
         #jsonInvertedRawData = json.dumps(invertedRawData)
