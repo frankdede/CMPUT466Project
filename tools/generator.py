@@ -29,18 +29,24 @@ def createFreqMatrix(n,splitedRawData,freqLookupData):
         
         freqMatrix[entry][n] = str(splitedRawData[entry]['sentiment'])
         print(entry,freqMatrix[entry][n])
+    
     saveMatrix('matrix.txt',freqMatrix,None)
+    print("Done")
 
 def createFeatureBagMatrix(splitedRawData,totalLabelSet=None):
+    print("============== Creating Bag of Words Matrix ==============")
+
     if(totalLabelSet!=None):
         totalLabelSet = set()
         header = StringIO.StringIO()
         for sentence in splitedRawData:
             totalLabelSet = totalLabelSet.union(set(sentence['sentence']))
+
     header.write("@attribute\n");
     map(lambda x:header.write(x+"|DOUBLE|\n"),totalLabelSet)
     header.write("sentiment|DOUBLE|{0,1,2,3,4}\n");
     header.write("\n@data\n");
+
     matrix_list= list()
     for sentence in splitedRawData:
         tmp = map(lambda x:1 if x in sentence['sentence'] else 0,totalLabelSet)
@@ -51,6 +57,8 @@ def createFeatureBagMatrix(splitedRawData,totalLabelSet=None):
     print(matrix.shape)
     saveMatrix("matrix2.txt",matrix,header.getvalue())
     header.close()
+
+    print("Done")
     return matrix
 
 def saveMatrix(fileName,matrix,header):
