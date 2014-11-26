@@ -231,7 +231,7 @@ def main(argv):
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
 
         
-        matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
+        #matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
         
         # dump all the data
         #jsonInvertedRawData = json.dumps(invertedRawData)

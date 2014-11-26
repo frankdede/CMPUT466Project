@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import nltk
 import numpy
-
+import StringIO
 def createFreqMatrix(n,splitedRawData,freqLookupData):
     print("====== Creating Frequency Training Set ======= ")
     size = (len(splitedRawData))
@@ -29,13 +29,17 @@ def createFreqMatrix(n,splitedRawData,freqLookupData):
         
         freqMatrix[entry][n] = str(splitedRawData[entry]['sentiment'])
         print(entry,freqMatrix[entry][n])
-    saveMatrix(freqMatrix)
+    saveMatrix('matrix.txt',freqMatrix,None)
 
-def createFeatureBagMatrix(splitedRawData):
-    totalLabelSet = set()
-    for sentence in splitedRawData:
-        totalLabelSet = totalLabelSet.union(set(sentence['sentence']))
-    #listFeatures = listFeatures[:1000]
+def createFeatureBagMatrix(splitedRawData,totalLabelSet=None):
+    if(totalLabelSet!=None):
+        totalLabelSet = set()
+        header = StringIO.StringIO()
+        for sentence in splitedRawData:
+            totalLabelSet = totalLabelSet.union(set(sentence['sentence']))
+    header.write("@attribute\n");
+    map(lambda x:header.write(x+"|DOUBLE|\n"),totalLabelSet)
+    header.write("sentiment|DOUBLE|{0,1,2,3,4}\n");
     matrix_list= list()
     for sentence in splitedRawData:
         tmp = map(lambda x:1 if x in sentence['sentence'] else 0,totalLabelSet)
@@ -44,12 +48,15 @@ def createFeatureBagMatrix(splitedRawData):
     matrix_array = numpy.array(matrix_list)
     matrix = numpy.matrix(matrix_array)
     print(matrix.shape)
-    numpy.savetxt("matrix2.txt", matrix, delimiter=",",fmt="%s")
+    saveMatrix("matrix2.txt",matrix,header.getvalue())
+    header.close()
     return matrix
 
-
-def saveMatrix(matrix):
-    numpy.savetxt("matrix.txt", matrix, delimiter=",",fmt="%s")
+def saveMatrix(fileName,matrix,header):
+    if header is None:
+        numpy.savetxt(fileName, matrix, delimiter=",",fmt="%s")
+    else:
+        numpy.savetxt(fileName, matrix, delimiter=",",header=header,fmt="%s")
 
 if __name__ == '__main__':
     rawData = [{'sentiment':1,'sentence':["My","name","is","frank","huang",".","lalal","dads","dsddsa"]}]
