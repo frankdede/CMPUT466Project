@@ -6,6 +6,7 @@ from sklearn import metrics
 class SVM:
 	x=[]
 	y=[]
+	labels=[]
 	clf = None
 	def __init__(self,filename):
 		with open(filename) as f:
@@ -16,22 +17,41 @@ class SVM:
 					tmp = map(lambda x:float(x),tmp)
 					self.x.append(tmp[:-1])
 					self.y.append(tmp[-1])
+				elif line[0] == 's':
+					line = line.strip('\n').split('|')
+					print(line)
+					self.labels = map(lambda x: int(x),line[2].strip('{}').split(','))
 		self.clf = svm.SVC()
+		print(self.labels)
 	def train(self):
 		self.clf.fit(self.x,self.y)
 	def predict(self,input):
 		return self.clf.predict(input)
-	def crossValidate(self,test_size=None):
+	def crossValidate(self,test_size=None,confusion_matrux=False):
 		if len(self.x)==0 or len(self.y) ==0:
 			sys.stderr.write("Uninitialized object")
 			return
-		crossv = cv.ShuffleSplit(len(self.x), n_iter=3,test_size=0.3, random_state=0)
-		print(crossv)
-		scores = cv.cross_val_score(self.clf,self.x,self.y,cv=crossv)
-		#clf = self.clf.fit(X_train, y_train)
-		return scores 
+		#randomly draw from sample
+		X_train, X_test, y_train, y_test = cv.train_test_split(self.x, self.y, test_size=0.2, random_state=0)
+		self.clf.fit(X_train,y_train)
+		out = self.predict(X_test)
+		if confusion_matrux:
+			self.comput_confusion_matrix(out,y_test)
+		total_correct = 0
+		for i in range(len(out)):
+			if out[i] == y_test[i]:
+				total_correct +=1
+		return float(total_correct)/len(out)
+	def comput_confusion_matrix(self,y_out,y_test):
+		matrix = nu.zeros((len(self.labels),len(self.labels)),dtype=nu.int)
+		for i in xrange(len(y_out)):
+			matrix[y_test[i]][y_out[i]] +=1
+		print "     0   1   2   3   4 predict value"
+		for row_label, row in zip(self.labels, matrix):
+			print '%s [%s]' % (row_label, ' '.join('%03s' % i for i in row))
+		print "Expected"
 if __name__ == "__main__":
 	svm = SVM("../decisionTree/trainingSet/train_500.txt")
 	svm.train()
 	#for size in range(2,11):
-	print("test size:",svm.crossValidate())
+	print("Overall correct percentage:",svm.crossValidate(confusion_matrux=True))
