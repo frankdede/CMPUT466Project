@@ -194,7 +194,6 @@ def readArgsFromInput(argv):
         sys.exit("Cannot proceed wihout the raw data and/or stopwords")
 
     return rawDataName, stopWordsName, outputName, usedOpts
-
 def main(argv):
     
     rawDataName, stopWordsName, outputName, usedOpts = readArgsFromInput(argv)
@@ -224,7 +223,7 @@ def main(argv):
         out.saveWordSentiment(average,"average.txt")
             
         # Now bag of words is ready for feature construction
-        matrix2 = generator.createFeatureBagMatrix(rawData,featuresList)
+        generator.createFeatureBagMatrix(rawData,featuresList)
         
         # extract the bigrams from inverted raw data
         bigramsInvertedCollection = bigram.extractBigramsFromInvertedRawData(invertedRawData)
@@ -242,7 +241,7 @@ def main(argv):
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
 
         
-        #matrix = generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
+        generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
         
         # dump all the data
         #jsonInvertedRawData = json.dumps(invertedRawData)
