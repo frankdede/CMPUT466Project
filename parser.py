@@ -63,7 +63,7 @@ def extractRawTrainingData(text, stopWords, stemming):
             sentenceStr = lineTokens[2]
             sentiment = int(lineTokens[3])
 
-            sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
+            sentenceTokens = re.sub("\s+", " ", sentenceStr).split(' ')
 
             if stemming:
                 sentenceTokens = map(lambda x:unicode(st.stem(x).lower()),sentenceTokens)
@@ -71,7 +71,7 @@ def extractRawTrainingData(text, stopWords, stemming):
                 sentenceTokens = map(lambda x:unicode(x.lower()),sentenceTokens)
 
             sentenceTokens = stripWords(sentenceTokens,stopWords)
-            entry = {"sentenceId":sentenceId,"sentence":sentenceTokens,"sentiment":sentiment}
+            entry = {"sentenceId":sentenceId, "sentence":sentenceTokens, "sentiment":sentiment}
             rawData.append(entry)
 
     print("Done")
@@ -88,13 +88,12 @@ def extractRawTestData(text):
 
         lineTokens = line.strip('\n').split('\t')
 
-        sentenceId = int(lineTokens[1])
+        pharseId = int(lineTokens[0])
         sentenceStr = lineTokens[2]
-        sentiment = int(lineTokens[3])
 
         sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
         sentenceTokens = map(lambda x:unicode(x.lower()),sentenceTokens)
-        entry = {"sentenceId":sentenceId,"sentence":sentenceTokens,"sentiment":sentiment}
+        entry = {"pharseId":pharseId,"sentence":sentenceTokens}
         testData.append(entry)
 
     print("Done")
@@ -189,22 +188,22 @@ def readArgsFromInput(argv):
             print "-o <outputfile_filename> Define the name of output file.(It's named as no_stopwords.txt by default)"
             sys.exit()
 
-        elif opt in ("-r","--rawdata"):
+        elif opt in ("-r", "--rawdata"):
             rawDataName = arg
             usedOpts.append('-r')
 
-        elif opt in ("-s","--stopwords"):
+        elif opt in ("-s", "--stopwords"):
             stopWordsName = arg
             usedOpts.append('-s')
 
-        elif opt in ("-m","--stemming"):
+        elif opt in ("-m", "--stemming"):
             usedOpts.append('-m')
 
-        elif opt in ("-t","--testdata"):
+        elif opt in ("-t", "--testdata"):
             testDataName = arg
             usedOpts.append('-t')
 
-        elif opt in ("-o","--output"):
+        elif opt in ("-o", "--output"):
             outputName = arg
             usedOpts.append('-o')
 
@@ -241,27 +240,26 @@ def main(argv):
         else:
             stemming = False
 
-        invertedRawData = createInvertedTrainingData(rawDataFile,stopWordsList,stemming)
+        invertedRawData = createInvertedTrainingData(rawDataFile, stopWordsList, stemming)
         rawDataFile.close()
 
         rawDataFile = open(rawDataName,'r')
         # extract rawData from rawDataFile
-        rawTrainingData = extractRawTrainingData(rawDataFile,stopWordsList,stemming)
+        rawTrainingData = extractRawTrainingData(rawDataFile, stopWordsList, stemming)
         rawDataFile.close()
 
-        average,featuresList = stats.getWordAverageSentiment(rawTrainingData, 2)
+        average, featuresList = stats.getWordAverageSentiment(rawTrainingData, 50)
 
-        out.saveWordSentiment(average,"average.txt")
+        out.saveWordSentiment(average, "average.txt")
             
         # Now bag of words is ready for feature construction
-        print(len(featuresList))
-        generator.createFeatureBagMatrix(rawTrainingData,featuresList)
+        #generator.createFeatureBagMatrix(rawTrainingData,featuresList)
         
         # extract the bigrams from inverted raw data
         bigramsInvertedCollection = bigram.extractBigramsFromInvertedRawData(invertedRawData)
         biFreqDist = bigram.getFrequencyDist(bigramsInvertedCollection)
 
-        # extract the unigrams from inverted raw data
+        #extract the unigrams from inverted raw data
         #unigramsInvertedCollection = unigram.extractUnigramsFromInvertedRawData(invertedRawData)
         #uniFreqDist = bigram.getFrequencyDist(unigramsInvertedCollection)
         
@@ -270,30 +268,17 @@ def main(argv):
 
         # bigram sentences by n
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
-        generator.createFreqMatrix(3,splitedBigramRawData,biFreqDist)
+        generator.createFreqMatrix(3, splitedBigramRawData, biFreqDist)
         
         rawTestData = extractRawTestData(rawTestDataFile)
         bigramsRawData = bigram.extractBigramsFromRawData(rawTestData)
-        splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
-        generator.createFreqMatrix(3,splitedBigramRawData,biFreqDist)
-
-        # dump all the data
-        #jsonInvertedRawData = json.dumps(invertedRawData)
-        #jsonBigrams = json.dumps(bigramsInvertedCollection)
-        #jsonUnigrams = json.dumps(unigramsInvertedCollection)
-        #jsonRawData = json.dumps(rawData)
-        #jsonSplitedBigramRawData = json.dumps(splitedBigramRawData)
+        splitedBigramRawData = splitter.splitSentence(3, bigramsRawData)
+        #generator.createFreqMatrix(3, splitedBigramRawData, biFreqDist, isTestData = True)
 
         rawDataFile.close()
         stopWordsFile.close()
         rawTestDataFile.close()
 
-        # save files
-        #writeFile(outputName,jsonInvertedRawData)
-        #writeFile('rawdata.json',jsonRawData)
-        #writeFile('SplitedBigramRawData.json',jsonSplitedBigramRawData)
-        #writeFile('bigramsCollection.json',jsonBigrams)
-        #writeFile('unigramsCollection.json',jsonUnigrams)
     except IOError as e:
         print "Cannot read raw data file or stop-word file" 
 if __name__ == "__main__":

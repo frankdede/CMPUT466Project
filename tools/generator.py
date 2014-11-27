@@ -46,7 +46,7 @@ def createFreqMatrix(n,splitedRawData,freqLookupData,isTestData = False):
         if not isTestData:
             freqMatrix[entry][n] = str(splitedRawData[entry]['sentiment'])
 
-        # print(entry,freqMatrix[entry][n])
+        print(entry,freqMatrix[entry][n])
     if not isTestData:
         header = StringIO.StringIO()
         header.write("@attribute\n");
@@ -69,6 +69,7 @@ def createFeatureBagMatrix(splitedRawData,totalLabelSet=None):
         for sentence in splitedRawData:
             totalLabelSet = totalLabelSet.union(set(sentence['sentence']))
 
+    print(len(totalLabelSet))
     header.write("@attribute\n");
     map(lambda x:header.write(x+"|DOUBLE|\n"),totalLabelSet)
     header.write("sentiment|STRING|{0,1,2,3,4}\n");
