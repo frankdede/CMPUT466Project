@@ -101,7 +101,7 @@ def extractRawTestData(text):
     return testData
 
 def createInvertedTestData(text):
-    createInvertedTrainingData(text, None, None);
+    return createInvertedTrainingData(text, None, None);
 
 
 def createInvertedTrainingData(text, stopWords, stemming):
@@ -170,11 +170,11 @@ def stripWords(sentenceTokens,wordsList):
     return filter(lambda x: x not in wordsList, sentenceTokens)
 
 def readArgsFromInput(argv):
-    rawDataName = stopWordsName = outputName = directory = None 
+    testDataName = rawDataName = stopWordsName = outputName = directory = None 
     # Record the flags that user are using
     usedOpts = []
     try:
-        opts, args = getopt.getopt(argv,"hr:s:mio:",["rawdata=","stopwords=","ouput="])
+        opts, args = getopt.getopt(argv,"hr:s:mio:t:",["rawdata=","stopwords=","ouput=","testdata="])
     except getopt.GetoptError:
         print 'run parser.py with flag -h to get help doc' 
         sys.exit()
@@ -182,9 +182,10 @@ def readArgsFromInput(argv):
         if opt == '-h':
             print 'Flags List:'
             print '-h Help' 
-            print '-r <rawdata_filename> Import raw data file' 
+            print '-r <rawdata_filename> Import raw training data file' 
             print '-s <stopwords_filename> Import stopwords file'
             print '-m Stemming enabled'
+            print '-t <test_filename> Import test data file'
             print "-o <outputfile_filename> Define the name of output file.(It's named as no_stopwords.txt by default)"
             sys.exit()
 
@@ -198,6 +199,10 @@ def readArgsFromInput(argv):
 
         elif opt in ("-m","--stemming"):
             usedOpts.append('-m')
+
+        elif opt in ("-t","--testdata"):
+            testDataName = arg
+            usedOpts.append('-t')
 
         elif opt in ("-o","--output"):
             outputName = arg
@@ -215,16 +220,17 @@ def readArgsFromInput(argv):
         outputName = 'default_invertedRawdata.json'
 
     # cannot proceed without filename of raw data
-    if rawDataName == None or stopWordsName == None:
+    if rawDataName == None or stopWordsName == None or testDataName == None:
         sys.exit("Cannot proceed wihout the raw data and/or stopwords")
 
-    return rawDataName, stopWordsName, outputName, usedOpts
+    return testDataName, rawDataName, stopWordsName, outputName, usedOpts
 def main(argv):
     
-    rawDataName, stopWordsName, outputName, usedOpts = readArgsFromInput(argv)
+    testDataName, rawDataName, stopWordsName, outputName, usedOpts = readArgsFromInput(argv)
     # load raw data
     try:
         rawDataFile = open(rawDataName,'r')
+        rawTestDataFile = open(testDataName,'r')
         stopWordsFile = open(stopWordsName,'r')
 
         # create stopwords list
@@ -248,26 +254,29 @@ def main(argv):
         out.saveWordSentiment(average,"average.txt")
             
         # Now bag of words is ready for feature construction
+        print(len(featuresList))
         generator.createFeatureBagMatrix(rawTrainingData,featuresList)
         
         # extract the bigrams from inverted raw data
         bigramsInvertedCollection = bigram.extractBigramsFromInvertedRawData(invertedRawData)
-        freqDist = bigram.getFrequencyDist(bigramsInvertedCollection)
+        biFreqDist = bigram.getFrequencyDist(bigramsInvertedCollection)
 
         # extract the unigrams from inverted raw data
-        unigramsInvertedCollection = unigram.extractUnigramsFromInvertedRawData(invertedRawData)
-        unifreqDist = bigram.getFrequencyDist(unigramsInvertedCollection)
+        #unigramsInvertedCollection = unigram.extractUnigramsFromInvertedRawData(invertedRawData)
+        #uniFreqDist = bigram.getFrequencyDist(unigramsInvertedCollection)
         
         # extract the bigrams from raw data
         bigramsRawData = bigram.extractBigramsFromRawData(rawTrainingData)
 
-        # bigram sentences by n 
-
+        # bigram sentences by n
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
+        generator.createFreqMatrix(3,splitedBigramRawData,biFreqDist)
+        
+        rawTestData = extractRawTestData(rawTestDataFile)
+        bigramsRawData = bigram.extractBigramsFromRawData(rawTestData)
+        splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
+        generator.createFreqMatrix(3,splitedBigramRawData,biFreqDist)
 
-        
-        #generator.createFreqMatrix(3,splitedBigramRawData,freqDist)
-        
         # dump all the data
         #jsonInvertedRawData = json.dumps(invertedRawData)
         #jsonBigrams = json.dumps(bigramsInvertedCollection)
@@ -277,6 +286,7 @@ def main(argv):
 
         rawDataFile.close()
         stopWordsFile.close()
+        rawTestDataFile.close()
 
         # save files
         #writeFile(outputName,jsonInvertedRawData)
