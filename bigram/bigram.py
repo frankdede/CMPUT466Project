@@ -33,4 +33,5 @@ def extractBigramsFromRawData(rawData):
     for entry in rawData:
         bigramsTupleList= list(nltk.bigrams(entry['sentence']))
         entry['sentence'] = bigramsTupleList
+    print entry
     return rawData
