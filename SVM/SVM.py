@@ -6,21 +6,23 @@ from sklearn import metrics
 class SVM:
 	x=[]
 	y=[]
-	labels=[]
+	labels=[0,1,2,3,4]
 	clf = None
 	def __init__(self,filename):
+		is_attr = False;
 		with open(filename) as f:
 			for line in f:
-				if(line[0]>='0' and line[0]<='9'):
-					#print(line)
-					tmp = line.strip('\n').split(',')
-					tmp = map(lambda x:float(x),tmp)
-					self.x.append(tmp[:-1])
-					self.y.append(tmp[-1])
-				elif line[0] == 's':
-					line = line.strip('\n').split('|')
-					print(line)
-					self.labels = map(lambda x: int(x),line[2].strip('{}').split(','))
+				if line == '@attribute\n':
+					is_attr = True
+				if line == '@data\n':
+					is_attr = False
+					continue
+				if is_attr: continue
+				tmp = line.strip('\n').split(',')
+				tmp = map(lambda x:float(x),tmp)
+				self.x.append(tmp[:-1])
+				self.y.append(tmp[-1])
+		print(len(self.x))
 		self.clf = svm.SVC()
 		print(self.labels)
 	def train(self):
@@ -51,7 +53,8 @@ class SVM:
 			print '%s [%s]' % (row_label, ' '.join('%03s' % i for i in row))
 		print "Expected"
 if __name__ == "__main__":
-	svm = SVM("../decisionTree/trainingSet/train_500.txt")
+	#svm = SVM("../decisionTree/trainingSet/train_500.txt")
+	svm = SVM("bag_train.txt")
 	svm.train()
 	#for size in range(2,11):
 	print("Overall correct percentage:",svm.crossValidate(confusion_matrux=True))

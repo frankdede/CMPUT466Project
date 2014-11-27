@@ -7,20 +7,23 @@ class naiveBayes:
 	gnb = None
 	x = []
 	y = []
-	labels = []
+	labels=[0,1,2,3,4]
 	def __init__(self,filename):
 		self.gnb = GaussianNB()
 		with open(filename) as f:
+			is_attr = False;
 			for line in f:
+				if line == '@attribute\n':
+					is_attr = True
+				if line == '@data\n':
+					is_attr = False
+					continue
+				if is_attr: continue
 				if line[0]>='0' and line[0]<='9':
 					tmp = line.strip('\n').split(',')
 					tmp = map(lambda x:float(x),tmp)
 					self.x.append(tmp[:-1])
 					self.y.append(tmp[-1])
-				elif line[0] == 's':
-					line = line.strip('\n').split('|')
-					print(line)
-					self.labels = map(lambda x: int(x),line[2].strip('{}').split(','))
 	def train(self):
 		self.gnb.fit(self.x,self.y)
 	def predict(self,input):
@@ -49,6 +52,7 @@ class naiveBayes:
 			print '%s [%s]' % (row_label, ' '.join('%03s' % i for i in row))
 		print "Expected"
 if __name__ == '__main__':
-	nb = naiveBayes("../decisionTree/trainingSet/train_500.txt");
+	#nb = naiveBayes("../decisionTree/trainingSet/train_500.txt");
+	nb = naiveBayes("bag_train.txt")
 	nb.train()
 	print("Overall correct percentage:",nb.crossValidate(confusion_matrux=True))
