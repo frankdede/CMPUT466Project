@@ -10,6 +10,8 @@ from sklearn.externals.six import StringIO
 #from scipy.io.arff import loadarff
 import pydot
 import sys
+import gzip
+
 
 import scipy as sp
 import numpy as np
@@ -23,6 +25,10 @@ class tree_builder:
             self.tree = tree.DecisionTreeClassifier(max_depth=depth)
         else:
             self.tree = tree.DecisionTreeClassifier()
+
+        self.attr_size = 0
+        self.feature_size = 0
+        self.data_size = 0
         self.data = []
         self.attr = {}
         self.dot_data = StringIO()
@@ -56,6 +62,26 @@ class tree_builder:
 
         self.trained = True
 
+    def cross_validation_test(self, chunk_count, index):
+        self.build_fit_data()
+
+        data_length = len(self.data)
+        left = (data_length / chunk_count) * index
+        right = (data_length / chunk_count) * index + 1
+        
+        data_set = []
+
+        for i in xrange(data_length):
+            if i < left or i >= right:
+                data_set.append(self.data[i])
+
+        x_func = lambda x: x[:-1]
+        y_func = lambda x: str(x[-1:])
+        x = map(x_func, self.data)
+        y = map(y_func, self.data)
+
+        self.tree.fit(x, y)
+
     def fit_part(self, pos, length):
         self.build_fit_data()
 
@@ -69,7 +95,7 @@ class tree_builder:
         self.tree.fit(x, y)
 
     def fit(self):
-        #self.build_fit_data()
+        # self.build_fit_data()
         #x_func = lambda x: x[:-1]
         #y_func = lambda x: str( x[-1:])
         #x = map(x_func, self.data)
@@ -77,11 +103,17 @@ class tree_builder:
 
         return self.fit_part(0, -1)
 
-    def load_data_from_file(self, path):
+    def load_data_from_file(self, path, g=False):
         """load data from file"""
         self.attr_order = 0
         current_work = -1
-        for line in open(path, 'r'):
+
+        if g:
+            fp = gzip.open(path)
+        else:
+            fp = open(path)
+
+        for line in fp:
             line = line.strip()
 
             if line == "":
@@ -104,15 +136,22 @@ class tree_builder:
                     sys.exit()
 
                 if current_work == 'attr':
+                    self.attr_size += 1
                     self.process_attr_line(line)
                 elif current_work == 'data':
+                    self.data_size += 1
                     self.process_data_line(line)
+
+        fp.close()
 
     def load_data_from_dict(self, data):
         pass
 
     def process_data_line(self, line):
         line_set = line.split(",")
+        if len(line_set) != self.attr_size:
+            raise Exception("feature size[%d] not match attribute size[%d]"
+                            % (len(line_set), self.attr_size))
         self.data.append(line_set)
 
     def process_attr_line(self, line):
@@ -180,10 +219,11 @@ def main():
     parser.add_argument("OUTPUT", nargs=1, help="Output tree graph pdf")
     parser.add_argument(
         "-d", dest='depth', default=-1, help="max depth", type=int)
+    parser.add_argument('-g', default=False, action='store_true')
     args = parser.parse_args(sys.argv[1:])
 
     t = tree_builder(args.depth)
-    t.load_data_from_file(args.INPUT[0])
+    t.load_data_from_file(args.INPUT[0], args.g)
     t.fit()
 
     t.dump_tree('./tree_dump/tree.pkl')
@@ -193,9 +233,10 @@ def main():
 
 def test():
     t = tree_builder()
-    t.load_data_from_file('test/test1.txt')
-    t.fit()
-    t.plot_png('test.png')
+    t.load_data_from_file("trainingSet/train_500.txt")
+
+    return t
+
 
 if __name__ == '__main__':
     main()

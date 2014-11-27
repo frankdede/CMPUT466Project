@@ -8,9 +8,7 @@ import argparse
 import buildtree as bt
 
 
-def get_accuray_socre(t, pos, length, size):
-    data_length = len(t.data)
-    end = pos + length
+def get_accuray_socre(t, left_pos, right_pos):
 
     right = 0.0
     wrong_set = {}
@@ -20,10 +18,8 @@ def get_accuray_socre(t, pos, length, size):
         for j in index:
             wrong_set[i][j] = 0
 
-    for i in range(data_length):
-        if i > pos and i < end:
-            continue
-        row = t.data[i]
+    for row in t.data[left_pos:right_pos]:
+
         r = t.classerify(row[:-1])
 
         real_r = str(row[-1])
@@ -37,7 +33,8 @@ def get_accuray_socre(t, pos, length, size):
         except:
             print r, real_r, pref_r
 
-    accuracy = right / (data_length - length)
+    accuracy = right / (right_pos - left_pos)
+
     return (accuracy, wrong_set)
 
 
@@ -45,13 +42,14 @@ def mk_test(t, freg_size):
     data_length = len(t.data)
 
     freg_count = data_length / freg_size
-    pos = [freg_count * i for i in xrange(freg_size)]
+    # pos = [freg_count * i for i in xrange(freg_size)]
 
     result = {'accuracy': [], 'error_set': []}
 
-    for i in pos:
-        t.fit_part(i, freg_count)
-        accuracy, error_set = get_accuray_socre(t, i, freg_count, freg_size)
+    for i in xrange(freg_size):
+        t.cross_validation_test(freg_count, i)
+        accuracy, error_set = get_accuray_socre(t, i * freg_count,
+                                     (i + 1) * freg_count)
         result['accuracy'].append(accuracy)
         result['error_set'].append(error_set)
 
@@ -86,10 +84,11 @@ def main():
     parser.add_argument('INPUT', nargs=1, help="Input data file")
     parser.add_argument(
         "-d", dest='depth', default=-1, help="max depth", type=int)
+    parser.add_argument('-g', default=False, action='store_true')
     args = parser.parse_args(sys.argv[1:])
 
     t = bt.tree_builder(args.depth)
-    t.load_data_from_file(args.INPUT[0])
+    t.load_data_from_file(args.INPUT[0], args.g)
 
     # freg_fit_result={}
     max_socre = 0
