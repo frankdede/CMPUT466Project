@@ -77,8 +77,8 @@ class tree_builder:
 
         x_func = lambda x: x[:-1]
         y_func = lambda x: str(x[-1:])
-        x = map(x_func, self.data)
-        y = map(y_func, self.data)
+        x = map(x_func, data_set)
+        y = map(y_func, data_set)
 
         self.tree.fit(x, y)
 
