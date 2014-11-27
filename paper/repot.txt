@@ -1,0 +1,3 @@
+Sentiment Analysis on Movie Reviews
+Abstract:
+In this study we use machine learning techniques on finding the accuracy of classifying movies reviews into different sentiments ranging from zero to four. The movie reviews we got from Kaggle which is our data set and classify the reviews by authors' attitude that we collected from the reviews.  We propose different approaches in extracting reviews features into “bag of words” and “tf-idf”, and stripe stop words out, also stemming to group the words to their root words . For evaluation of the accuracy, we use three machine learning methods – Naive Bayes, SVM and Decision Tree. We conclude our study with explanation of observed trends in accuracy rates and providing directions for future work.
