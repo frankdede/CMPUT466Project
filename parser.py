@@ -250,10 +250,14 @@ def main(argv):
         rawTrainingData = extractRawTrainingData(rawDataFile, stopWordsList, stemming)
         rawDataFile.close()
 
+        #featuresList = stats.getTFIDF(rawTrainingData)
+        #print featuresList
+
         average, featuresList = stats.getWordAverageSentiment(rawTrainingData, 50)
 
         # save average word score
         out.saveWordSentiment(average, "average.txt")
+
 
         # extract the bigrams from inverted raw data
         bigramsInvertedCollection = bigram.extractBigramsFromInvertedRawData(invertedRawData)
@@ -266,9 +270,12 @@ def main(argv):
         '''
         create bag_train
         '''
-        # Now bag of words is ready for feature construction
-        #generator.createFeatureBagMatrix(rawTrainingData,featuresList)
         
+        #Now bag of words is ready for feature construction
+        '''
+        generator.createFeatureBagMatrix(rawTrainingData,featuresList)
+        '''
+
         '''
         Create bigram freq_train
         '''
