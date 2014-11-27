@@ -41,7 +41,7 @@ def getWordAverageSentiment(rawData, threshold):
                 answer[token] = [sentiment]
     answer = {k :v for k, v in answer.items() if len(v) > threshold}
     for i in answer:
-        answer[i] = [sum(answer[i])/float(len(answer[i])),len(answer[i])]
+        answer[i] = [sum(answer[i])/float(len(answer[i])), len(answer[i])]
 
     sortedAvg = sorted(answer.items(), key=lambda (k, v): v[1], reverse = True)
     print("Done")
