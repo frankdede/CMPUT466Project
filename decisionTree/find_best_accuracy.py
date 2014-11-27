@@ -94,7 +94,7 @@ def main():
 
     if args.chunk != 0:
         mk_test(t, args.chunk)
-
+        exit()
     # freg_fit_result={}
     max_socre = 0
     max_socre_idx = -1
