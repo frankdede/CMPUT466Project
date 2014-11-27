@@ -15,12 +15,12 @@ def load_test_data(path, tree):
     for i in open(path):
         p_set = i.strip().split(',')
 
-        if len(p_set) != tree.attr_length:
+        if len(p_set) != tree.attr_size:
             raise Exception("Test data feature length not equal to",
                             " attr length")
 
         test_id = int(p_set[0])
-        data = map(float, p_set[0])
+        data = map(float, p_set[1:])
         test_data[test_id] = {'data': data, 'result': None}
 
     return test_data
@@ -42,22 +42,24 @@ def main():
 
     t = tree_builder(args.depth)
     t.load_data_from_file(args.TRAIN_INPUT[0], args.g)
+    t.fit()
 
     test_data = load_test_data(args.TEST_INPUT[0], t)
 
     print "Finish load test_data with %d entries" % len(test_data)
 
+
     for i in test_data:
         result = t.classerify(test_data[i]['data'])
 
-        test_data[i]['result'] = result
+        test_data[i]['result'] = result[0]
 
     print "Finish classification"
 
     fp = open(args.OUTPUT[0], "w")
 
     for i in sorted(test_data.keys()):
-        fp.write("%s,%s\n" % (i, test_data[i]['result']))
+        fp.write("%s,%s\n" % (i, test_data[i]['result'][1]))
 
     fp.close()
 
