@@ -75,6 +75,7 @@ def extractRawTrainingData(text, stopWords, stemming):
             rawData.append(entry)
 
     print("Done")
+    print(len(rawData))
     return rawData
         
 #@timeExec
@@ -97,6 +98,7 @@ def extractRawTestData(text):
         testData.append(entry)
 
     print("Done")
+
     return testData
 
 def createInvertedTestData(text):
@@ -268,12 +270,12 @@ def main(argv):
 
         # bigram sentences by n
         splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
-        generator.createFreqMatrix(3, splitedBigramRawData, biFreqDist)
+        #generator.createFreqMatrix(3, splitedBigramRawData, biFreqDist)
         
         rawTestData = extractRawTestData(rawTestDataFile)
         bigramsRawData = bigram.extractBigramsFromRawData(rawTestData)
         splitedBigramRawData = splitter.splitSentence(3, bigramsRawData)
-        #generator.createFreqMatrix(3, splitedBigramRawData, biFreqDist, isTestData = True)
+        generator.createFreqMatrix(3, splitedBigramRawData, biFreqDist, isTestData = True)
 
         rawDataFile.close()
         stopWordsFile.close()

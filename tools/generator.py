@@ -12,7 +12,7 @@ def createFreqMatrix(n,splitedRawData,freqLookupData,isTestData = False):
     if isTestData:
         print("============= Create Frequency Test Set ==============")
         # exclude the last comma
-        dtype = dtype[0:-1]
+        dtype = 'i,' + dtype[0:-1]
     else:
         print("============== Create Frequency Training Set ==============")
         # add a1 type to dtype
@@ -25,6 +25,12 @@ def createFreqMatrix(n,splitedRawData,freqLookupData,isTestData = False):
 
     for entry in range(len(splitedRawData)):
         size = (1,len(splitedRawData[entry]['sentence']))
+
+        if isTestData:
+            freqMatrix[entry][0] = splitedRawData[entry]['pharseId']
+        else:
+            freqMatrix[entry][n] = str(splitedRawData[entry]['sentiment'])
+
         for part in range(len(splitedRawData[entry]['sentence'])):
             total = 0;
             for gram in splitedRawData[entry]['sentence'][part]:
@@ -34,30 +40,31 @@ def createFreqMatrix(n,splitedRawData,freqLookupData,isTestData = False):
                 f3 = freqLookupData[3].freq(gram)
                 f4 = freqLookupData[4].freq(gram)
                 values = [f0,f1,f2,f3,f4]
-
                 # find the highest value
                 highestSentiment = values.index(max(values))
             # sum up
             total += highestSentiment
-
             partAverage = total/float(len(splitedRawData[entry]['sentence']))
-            freqMatrix[entry][part] = partAverage
-        
-        if not isTestData:
-            freqMatrix[entry][n] = str(splitedRawData[entry]['sentiment'])
 
+        if isTestData:
+            freqMatrix[entry][part + 1] = partAverage
+        else:
+            freqMatrix[entry][part] = partAverage
+            
         print(entry,freqMatrix[entry][n])
+
     if not isTestData:
         header = StringIO.StringIO()
         header.write("@attribute\n");
+
         for i in range(n):
-            header.write("part" + str(i+1)+"|DOUBLE|\n")
+            header.write("part" + str(i + 1) + "|DOUBLE|\n")
+
         header.write("sentiment|STRING|{0,1,2,3,4}\n");
         header.write("\n@data");
-
-        saveMatrix('freq_test', freqMatrix, header.getvalue())
+        saveMatrix('freq_train', freqMatrix, header.getvalue())
     else:
-        saveMatrix('freq_train', freqMatrix)
+        saveMatrix('freq_test', freqMatrix)
 
     print("Done")
 
