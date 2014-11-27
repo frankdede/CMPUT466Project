@@ -84,11 +84,16 @@ def main():
     parser.add_argument('INPUT', nargs=1, help="Input data file")
     parser.add_argument(
         "-d", dest='depth', default=-1, help="max depth", type=int)
+    parser.add_argument(
+        "-c", dest='chunk', default=0, help="chunk size", type=int)
     parser.add_argument('-g', default=False, action='store_true')
     args = parser.parse_args(sys.argv[1:])
 
     t = bt.tree_builder(args.depth)
     t.load_data_from_file(args.INPUT[0], args.g)
+
+    if args.chunk != 0:
+        mk_test(t, args.chunk)
 
     # freg_fit_result={}
     max_socre = 0
