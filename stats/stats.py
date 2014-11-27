@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import operator
 from tools import out
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 def lenLongestSentence(invertedRawData):
     longestLen = 0
@@ -46,3 +47,21 @@ def getWordAverageSentiment(rawData, threshold):
     sortedAvg = sorted(answer.items(), key=lambda (k, v): v[1], reverse = True)
     print("Done")
     return sortedAvg, list(answer.keys())
+
+def getTFIDF(rawData):
+    list = []
+    for entry in rawData:
+        sentence = " ".join(entry["sentence"])
+        list.extend([sentence])
+
+    tfidf = TfidfVectorizer()
+    response = tfidf.fit_transform(list)
+    words = tfidf.get_feature_names()
+    dict = {}
+    for i in response.nonzero()[1]
+        dict[words[i]] = response[0,i]
+    return dict
+
+
+
+

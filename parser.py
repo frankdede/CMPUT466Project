@@ -252,31 +252,45 @@ def main(argv):
 
         average, featuresList = stats.getWordAverageSentiment(rawTrainingData, 50)
 
+        # save average word score
         out.saveWordSentiment(average, "average.txt")
-            
-        # Now bag of words is ready for feature construction
-        #generator.createFeatureBagMatrix(rawTrainingData,featuresList)
-        
+
         # extract the bigrams from inverted raw data
         bigramsInvertedCollection = bigram.extractBigramsFromInvertedRawData(invertedRawData)
         biFreqDist = bigram.getFrequencyDist(bigramsInvertedCollection)
 
         #extract the unigrams from inverted raw data
-        #unigramsInvertedCollection = unigram.extractUnigramsFromInvertedRawData(invertedRawData)
-        #uniFreqDist = bigram.getFrequencyDist(unigramsInvertedCollection)
-        
-        # extract the bigrams from raw data
-        bigramsRawData = bigram.extractBigramsFromRawData(rawTrainingData)
+        unigramsInvertedCollection = unigram.extractUnigramFromInvertedRawData(invertedRawData)
+        uniFreqDist = bigram.getFrequencyDist(unigramsInvertedCollection)
 
+        '''
+        create bag_train
+        '''
+        # Now bag of words is ready for feature construction
+        #generator.createFeatureBagMatrix(rawTrainingData,featuresList)
+        
+        '''
+        Create bigram freq_train
+        '''
+        # extract the bigrams from raw data
+        '''
+        bigramsRawTrainingData = bigram.extractBigramsFromRawData(rawTrainingData)
+        unigramRawTrainingData = rawTrainingData
         # bigram sentences by n
-        splitedBigramRawData = splitter.splitSentence(3,bigramsRawData)
-        #generator.createFreqMatrix(3, splitedBigramRawData, biFreqDist)
+        splitedBigramRawData = splitter.splitSentence(3,unigramRawTrainingData)
+        generator.createFreqMatrix(3, splitedBigramRawData, uniFreqDist)
+        '''
+        
+        '''
+        Create unigram freq_test
+        '''
         
         rawTestData = extractRawTestData(rawTestDataFile)
-        bigramsRawData = bigram.extractBigramsFromRawData(rawTestData)
-        splitedBigramRawData = splitter.splitSentence(3, bigramsRawData)
-        generator.createFreqMatrix(3, splitedBigramRawData, biFreqDist, isTestData = True)
-
+        #bigramsRawTestData = bigram.extractBigramsFromRawData(rawTestData)
+        uigramRawTestData = rawTestData
+        splitedBigramRawData = splitter.splitSentence(3, uigramRawTestData)
+        generator.createFreqMatrix(3, splitedBigramRawData, uniFreqDist, isTestData = True)
+        
         rawDataFile.close()
         stopWordsFile.close()
         rawTestDataFile.close()
