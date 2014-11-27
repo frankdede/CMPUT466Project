@@ -49,16 +49,17 @@ def getWordAverageSentiment(rawData, threshold):
     return sortedAvg, list(answer.keys())
 
 def getTFIDF(rawData):
+    print("============== Getting tf-idf ==============")
     list = []
     for entry in rawData:
         sentence = " ".join(entry["sentence"])
-        list.extend([sentence])
+        list.extend(sentence)
 
     tfidf = TfidfVectorizer()
     response = tfidf.fit_transform(list)
     words = tfidf.get_feature_names()
     dict = {}
-    for i in response.nonzero()[1]
+    for i in response.nonzero()[1]:
         dict[words[i]] = response[0,i]
     return dict
 
