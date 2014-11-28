@@ -7,14 +7,10 @@
 import argparse
 from sklearn import tree
 from sklearn.externals.six import StringIO
-#from scipy.io.arff import loadarff
 import pydot
 import sys
 import gzip
-
-
-import scipy as sp
-import numpy as np
+from hashlib import sha1
 
 
 class tree_builder:
@@ -67,10 +63,9 @@ class tree_builder:
 
         data_length = len(self.data)
         left = (data_length / chunk_count) * index
-        right = (data_length / chunk_count) * index + 1
-        
-        data_set = []
+        right = (data_length / chunk_count) * (index + 1)
 
+        data_set = []
         for i in xrange(data_length):
             if i < left or i >= right:
                 data_set.append(self.data[i])
@@ -103,11 +98,18 @@ class tree_builder:
 
         return self.fit_part(0, -1)
 
-    def load_data_from_file(self, path, g=False):
-        """load data from file"""
+    def load_data_from_file(self, path, g=False, duplicate=0):
+        """load data from file 
+            when duplicate = 0, do not remove duplicate   
+            duplicate = 1, remove same feature with same socre
+            duplicate = 2, remove same feature and average duplicate socre
+        """
         self.attr_order = 0
         current_work = -1
 
+        if duplicate:
+            self.duplicate_set = {}
+            print "Work in duplicate reduce mode [%d]" % duplicate
         if g:
             fp = gzip.open(path)
         else:
@@ -139,19 +141,61 @@ class tree_builder:
                     self.attr_size += 1
                     self.process_attr_line(line)
                 elif current_work == 'data':
-                    self.data_size += 1
-                    self.process_data_line(line)
+                    self.process_data_line(line, duplicate)
+
+        # update the socre with duplicate == 2
+        if duplicate == 1:
+            self.duplicate_set = dict(filter(lambda (k, v): v > 1,
+                                      self.duplicate_set.iteritems()))
+
+        elif duplicate == 2:
+            # update the socre for duplicate item
+            self.duplicate_set = dict(filter(lambda (k, v): v['count'] > 1,
+                                      self.duplicate_set.iteritems()))
+            for hash, record in self.duplicate_set.iteritems():
+                average_score = sum(record['score']) / record['count']
+
+                # convert score to int
+                average_score = int(average_score)
+
+                index = self.data.index(record['record'])
+                self.data[index][-1] = str(average_score)
 
         fp.close()
 
     def load_data_from_dict(self, data):
         pass
 
-    def process_data_line(self, line):
+    def process_data_line(self, line, duplicate):
         line_set = line.split(",")
+
         if len(line_set) != self.attr_size:
             raise Exception("feature size[%d] not match attribute size[%d]"
                             % (len(line_set), self.attr_size))
+
+        if duplicate == 1:   # remove duplicate feature with same socre
+            hash = sha1("".join(line_set)).hexdigest()
+            if hash in self.duplicate_set:
+                self.duplicate_set[hash] += 1
+                return
+
+            else:
+                self.duplicate_set[hash] = 1
+
+        elif duplicate == 2:   # remove duplicate feature then average socre
+            hash = sha1("".join(line_set[:-1])).hexdigest()
+            if hash in self.duplicate_set:
+                self.duplicate_set[hash]['count'] += 1
+                self.duplicate_set[hash]['score'].append(int(line_set[-1]))
+                return
+
+            else:
+                self.duplicate_set[hash] = {}
+                self.duplicate_set[hash]['count'] = 1
+                self.duplicate_set[hash]['score'] = [int(line_set[-1])]
+                self.duplicate_set[hash]['record'] = line_set
+
+        self.data_size += 1
         self.data.append(line_set)
 
     def process_attr_line(self, line):
@@ -203,7 +247,7 @@ class tree_builder:
 
         c = open(".tmp.dot", 'w')
         c.write(self.dot_data.getvalue())
-        from urllib import urlencode, quote
+        from urllib import quote
         import os
         post = "chl=%s&cht=gv" % quote(self.dot_data.getvalue())
         os.popen("curl -d '%s' https://chart.googleapis.com/chart -o %s"
@@ -232,11 +276,22 @@ def main():
 
 
 def test():
+    from sklearn import cross_validation as cv
     t = tree_builder()
-    t.load_data_from_file("trainingSet/train_500.txt")
-
-    return t
-
+    t.load_data_from_file("../bag_train.txt", 0, 2)
+    test_y = map(lambda x: x[-1], t.data)
+    test_x = map(lambda x: x[:-1], t.data)
+    X_train, X_test, y_train, y_test = cv.train_test_split(
+        test_x, test_y, test_size=0.2, random_state=0)
+    t.tree.fit(X_train, y_train)
+    out = t.tree.predict(X_test)
+    total_correct = 0
+    for i in range(len(out)):
+        if out[i] == y_test[i]:
+            total_correct += 1
+    print("randomly select:", float(total_correct) / len(out))
+    scores = cv.cross_val_score(t.tree, test_x, test_y, cv=5)
+    print("Fixed CV:", scores)
 
 if __name__ == '__main__':
     main()
