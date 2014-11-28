@@ -92,8 +92,17 @@ def main():
     t = bt.tree_builder(args.depth)
     t.load_data_from_file(args.INPUT[0], args.g)
 
+    print "Max Treedepth is %d" % args.depth
+
     if args.chunk != 0:
-        mk_test(t, args.chunk)
+        print "work with %d chunk" % args.chunk
+        print "Total Data size %d" % t.data_size
+        r = mk_test(t, args.chunk)
+        m = max(r['accuracy'])
+        index = r['accuracy'].index(m) + 1
+        print "\nsplit data into %02d chunk has the highest score %f\
+               with train all chunk except chunk %d" % (args.chunk, m, index)
+        print_wrong_matrix(r['error_set'][index - 1])
         exit()
     # freg_fit_result={}
     max_socre = 0
