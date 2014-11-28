@@ -53,15 +53,15 @@ def getTFIDF(rawData):
     list = []
     for entry in rawData:
         sentence = " ".join(entry["sentence"])
-        list.extend(sentence)
-
+        list.append(sentence)
     tfidf = TfidfVectorizer()
     response = tfidf.fit_transform(list)
     words = tfidf.get_feature_names()
     dict = {}
     for i in response.nonzero()[1]:
         dict[words[i]] = response[0,i]
-    return dict
+    sorted_dict = sorted(dict.items(), key = operator.itemgetter(1))
+    return sorted_dict
 
 
 

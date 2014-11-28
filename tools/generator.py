@@ -39,9 +39,10 @@ def createFreqMatrix(n,splitedRawData,freqLookupData,isTestData = False):
                 f2 = freqLookupData[2].freq(gram)
                 f3 = freqLookupData[3].freq(gram)
                 f4 = freqLookupData[4].freq(gram)
-                values = [f0,f1,f2,f3,f4]
+                values = [f0 * 0, f1 * 1, f2 * 2, f3 * 3, f4 * 4]
                 # find the highest value
-                highestSentiment = values.index(max(values))
+                highestSentiment = sum(values)/float(5)
+                #highestSentiment = values.index(max(values))
             # sum up
             total += highestSentiment
             partAverage = total/float(len(splitedRawData[entry]['sentence']))
