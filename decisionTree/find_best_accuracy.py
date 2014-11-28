@@ -13,6 +13,7 @@ def get_accuray_socre(t, left_pos, right_pos):
     right = 0.0
     wrong_set = {}
     index = t.attr['sentiment']['index']
+
     for i in index:
         wrong_set[i] = {}
         for j in index:
@@ -47,7 +48,7 @@ def mk_test(t, freg_size):
     result = {'accuracy': [], 'error_set': []}
 
     for i in xrange(freg_size):
-        t.cross_validation_test(freg_count, i)
+        t.cross_validation_test(freg_size, i)
         accuracy, error_set = get_accuray_socre(t, i * freg_count,
                                      (i + 1) * freg_count)
         result['accuracy'].append(accuracy)
@@ -87,10 +88,11 @@ def main():
     parser.add_argument(
         "-c", dest='chunk', default=0, help="chunk size", type=int)
     parser.add_argument('-g', default=False, action='store_true')
+    parser.add_argument('-r', default=0, action='count')
     args = parser.parse_args(sys.argv[1:])
 
     t = bt.tree_builder(args.depth)
-    t.load_data_from_file(args.INPUT[0], args.g)
+    t.load_data_from_file(args.INPUT[0], args.g, args.r)
 
     print "Max Treedepth is %d" % args.depth
 

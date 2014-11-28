@@ -38,16 +38,16 @@ def main():
     parser.add_argument(
         "-d", dest='depth', default=-1, help="max depth", type=int)
     parser.add_argument('-g', default=False, action='store_true')
+    parser.add_argument('-r', default=0, action='count')
     args = parser.parse_args(sys.argv[1:])
 
     t = tree_builder(args.depth)
-    t.load_data_from_file(args.TRAIN_INPUT[0], args.g)
+    t.load_data_from_file(args.TRAIN_INPUT[0], args.g, args.r)
     t.fit()
 
     test_data = load_test_data(args.TEST_INPUT[0], t)
 
     print "Finish load test_data with %d entries" % len(test_data)
-
 
     for i in test_data:
         result = t.classerify(test_data[i]['data'])
@@ -57,7 +57,7 @@ def main():
     print "Finish classification"
 
     fp = open(args.OUTPUT[0], "w")
-
+    fp.write("PhraseId,Sentiment\n")
     for i in sorted(test_data.keys()):
         fp.write("%s,%s\n" % (i, test_data[i]['result'][1]))
 
