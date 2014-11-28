@@ -27,7 +27,7 @@ def createFreqMatrix(n,splitedRawData,freqLookupData,isTestData = False):
         size = (1,len(splitedRawData[entry]['sentence']))
 
         if isTestData:
-            freqMatrix[entry][0] = splitedRawData[entry]['pharseId']
+            freqMatrix[entry][0] = splitedRawData[entry]['phraseId']
         else:
             freqMatrix[entry][n] = str(splitedRawData[entry]['sentiment'])
 
@@ -67,14 +67,15 @@ def createFreqMatrix(n,splitedRawData,freqLookupData,isTestData = False):
         saveMatrix('freq_test', freqMatrix)
 
     print("Done")
-def createTestFeatureMatrix(splitedRawData,,totalLabelSet=None):
+def createTestFeatureMatrix(splitedRawData,totalLabelSet=None):
     matrix = list()
     for sentence in splitedRawData:
         phraseId = sentence['phraseId']
         tmp = map(lambda x:1 if x in sentence['sentence'] else 0,totalLabelSet)
         matrix.append([phraseId]+tmp)
-    with open("bag_train") as f:
-        map(lambda x:f.write(",".join(x)),matrix)
+    with open("bag_test.txt", 'w') as f:
+        map(lambda x:f.write(",".join(map(str,x)) + "\n"),matrix)
+
 def createFeatureBagMatrix(splitedRawData,totalLabelSet=None):
     print("============== Create Bag of Words Training Set ==============")
     header = StringIO.StringIO()

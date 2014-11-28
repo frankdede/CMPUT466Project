@@ -89,12 +89,12 @@ def extractRawTestData(text):
 
         lineTokens = line.strip('\n').split('\t')
 
-        pharseId = int(lineTokens[0])
+        phraseId = int(lineTokens[0])
         sentenceStr = lineTokens[2]
 
         sentenceTokens = re.sub("\s+"," ",sentenceStr).split(' ')
         sentenceTokens = map(lambda x:unicode(x.lower()),sentenceTokens)
-        entry = {"pharseId":pharseId,"sentence":sentenceTokens}
+        entry = {"phraseId":phraseId,"sentence":sentenceTokens}
         testData.append(entry)
 
     print("Done")
@@ -230,9 +230,9 @@ def main(argv):
     testDataName, rawDataName, stopWordsName, outputName, usedOpts = readArgsFromInput(argv)
     # load raw data
     try:
-        rawDataFile = open(rawDataName,'r')
-        rawTestDataFile = open(testDataName,'r')
-        stopWordsFile = open(stopWordsName,'r')
+        rawDataFile = open(rawDataName, 'r')
+        rawTestDataFile = open(testDataName, 'r')
+        stopWordsFile = open(stopWordsName, 'r')
 
         # create stopwords list
         stopWordsList = createStopWordsList(stopWordsFile)
@@ -245,7 +245,7 @@ def main(argv):
         invertedRawData = createInvertedTrainingData(rawDataFile, stopWordsList, stemming)
         rawDataFile.close()
 
-        rawDataFile = open(rawDataName,'r')
+        rawDataFile = open(rawDataName, 'r')
         # extract rawData from rawDataFile
         rawTrainingData = extractRawTrainingData(rawDataFile, stopWordsList, stemming)
         rawDataFile.close()
@@ -270,7 +270,7 @@ def main(argv):
         '''
         create bag_train
         '''
-        
+
         #Now bag of words is ready for feature construction
         '''
         generator.createFeatureBagMatrix(rawTrainingData,featuresList)
@@ -294,15 +294,18 @@ def main(argv):
         
         rawTestData = extractRawTestData(rawTestDataFile)
         #bigramsRawTestData = bigram.extractBigramsFromRawData(rawTestData)
+        '''
         uigramRawTestData = rawTestData
         splitedBigramRawData = splitter.splitSentence(3, uigramRawTestData)
         generator.createFreqMatrix(3, splitedBigramRawData, uniFreqDist, isTestData = True)
-        
         rawDataFile.close()
         stopWordsFile.close()
         rawTestDataFile.close()
+        '''
 
+        generator.createTestFeatureMatrix(rawTestData, featuresList)
     except IOError as e:
+        print e
         print "Cannot read raw data file or stop-word file" 
 if __name__ == "__main__":
     main(sys.argv[1:])
