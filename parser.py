@@ -32,7 +32,7 @@ def createStopWordsList(text):
     return stopWordsList
 
 
-def extractRawTrainingData(text, stopWords, stemming):
+def extractRawTrainingData(text, stopWords, stemming = None):
     st = LancasterStemmer()
     rawData = []
     text.readline()
@@ -56,7 +56,7 @@ def extractRawTrainingData(text, stopWords, stemming):
 
         lineTokens = line.strip('\n').split('\t')
         sentenceId = int(lineTokens[1])
-
+        '''
         if sentenceId > prevId:
 
             prevId = sentenceId
@@ -73,11 +73,25 @@ def extractRawTrainingData(text, stopWords, stemming):
             sentenceTokens = stripWords(sentenceTokens,stopWords)
             entry = {"sentenceId":sentenceId, "sentence":sentenceTokens, "sentiment":sentiment}
             rawData.append(entry)
+        '''
+        sentenceStr = lineTokens[2]
+        sentiment = int(lineTokens[3])
+
+        sentenceTokens = re.sub("\s+", " ", sentenceStr).split(' ')
+
+        if stemming:
+            sentenceTokens = map(lambda x:unicode(st.stem(x).lower()),sentenceTokens)
+        else:
+            sentenceTokens = map(lambda x:unicode(x.lower()),sentenceTokens)
+
+        sentenceTokens = stripWords(sentenceTokens,stopWords)
+        entry = {"sentenceId":sentenceId, "sentence":sentenceTokens, "sentiment":sentiment}
+        rawData.append(entry)
 
     print("Done")
     print(len(rawData))
     return rawData
-        
+
 #@timeExec
 def extractRawTestData(text):
 
@@ -250,8 +264,8 @@ def main(argv):
         rawTrainingData = extractRawTrainingData(rawDataFile, stopWordsList, stemming)
         rawDataFile.close()
 
-        #featuresList = stats.getTFIDF(rawTrainingData)
-        #print featuresList
+        featuresList = stats.getTFIDF(rawTrainingData)
+        print featuresList
 
         average, featuresList = stats.getWordAverageSentiment(rawTrainingData, 50)
 
@@ -281,7 +295,7 @@ def main(argv):
         '''
         # extract the bigrams from raw data
         '''
-        bigramsRawTrainingData = bigram.extractBigramsFromRawData(rawTrainingData)
+        #bigramsRawTrainingData = bigram.extractBigramsFromRawData(rawTrainingData)
         unigramRawTrainingData = rawTrainingData
         # bigram sentences by n
         splitedBigramRawData = splitter.splitSentence(3,unigramRawTrainingData)
@@ -294,18 +308,19 @@ def main(argv):
         
         rawTestData = extractRawTestData(rawTestDataFile)
         #bigramsRawTestData = bigram.extractBigramsFromRawData(rawTestData)
-        '''
+        
         uigramRawTestData = rawTestData
         splitedBigramRawData = splitter.splitSentence(3, uigramRawTestData)
         generator.createFreqMatrix(3, splitedBigramRawData, uniFreqDist, isTestData = True)
+
         rawDataFile.close()
         stopWordsFile.close()
         rawTestDataFile.close()
+        
         '''
-
         generator.createTestFeatureMatrix(rawTestData, featuresList)
+        '''
     except IOError as e:
-        print e
         print "Cannot read raw data file or stop-word file" 
 if __name__ == "__main__":
     main(sys.argv[1:])
