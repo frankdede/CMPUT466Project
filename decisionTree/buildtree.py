@@ -234,7 +234,7 @@ def main():
 def test():
     from sklearn import cross_validation as cv
     t = tree_builder()
-    t.load_data_from_file("../freq_train.txt")
+    t.load_data_from_file("./freq_train-1.txt")
     test_y = map(lambda x:x[-1],t.data)
     test_x = map(lambda x:x[:-1],t.data)
     X_train, X_test, y_train, y_test = cv.train_test_split(test_x,test_y, test_size=0.2, random_state=0)
